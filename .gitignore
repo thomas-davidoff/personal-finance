@@ -1,0 +1,21 @@
+# editor / IDE
+.vscode/
+*.code-workspace
+
+# data files
+*.db
+*.csv
+backend/data/
+
+
+# old files that need to be cleaned out
+/backend/old/
+/backend/scripts/
+venv/
+
+
+# front end stuff
+node_modules
+dist
+dist-ssr
+*.local
