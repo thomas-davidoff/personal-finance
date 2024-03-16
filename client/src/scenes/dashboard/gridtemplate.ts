@@ -1,14 +1,12 @@
 export const gridTemplateLargeScreens = `
-  "a f e"
-  "a f e"
-  "a f e"
-  "b b c"
-  "b b c"
-  "b b c"
-  "b b c"
-  "d h h"
-  "g h h"
-  "g h h"
+  "control                  spendingSummary     spendingSummary         breakdown"
+  "control                  spendingSummary     spendingSummary         breakdown"
+  "cumulSpending            cumulSpending       categoryPie             breakdown"
+  "cumulSpending            cumulSpending       categoryPie             breakdown"
+  "cumulSpending            cumulSpending       categoryPie             breakdown"
+  "cumulSpending            cumulSpending       categoryPie             breakdown"
+  "recentTransactions       recentTransactions  recentTransactions      breakdown"
+  "recentTransactions       recentTransactions  recentTransactions      breakdown"
 `
 export const gridTemplateSmallScreens = `
   "a"
