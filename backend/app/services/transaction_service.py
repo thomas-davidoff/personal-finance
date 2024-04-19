@@ -1,5 +1,8 @@
 from utils import logger
 from app.repositories import transaction_repository
+from collections import defaultdict
+from decimal import Decimal
+from datetime import datetime, timedelta
 
 
 class TransactionService:
@@ -19,9 +22,16 @@ class TransactionService:
         ).all()
         return [t.to_dict() for t in all_transactions]
 
-    def add_transaction(self, description: str, amount: float, account_id: int, date: str):
+    def add_transaction(
+        self, description: str, amount: float, account_id: int, date: str
+    ):
         transaction = transaction_repository.create_transaction(
-            {"description": description, "amount": amount, "account_id": account_id, "date": date}
+            {
+                "description": description,
+                "amount": amount,
+                "account_id": account_id,
+                "date": date,
+            }
         )
         return transaction.to_dict()
 
@@ -40,6 +50,55 @@ class TransactionService:
             model_id=transaction_id
         )
         return deleted_transaction_message
+
+    def calc_daily_totals(self, start_date, end_date):
+        transactions = transaction_repository.get_transactions(
+            start_date=start_date, end_date=end_date
+        ).all()
+
+        daily_spending = defaultdict(Decimal)
+        daily_credits = defaultdict(Decimal)
+
+        for transaction in transactions:
+            transaction_day = (transaction.date - start_date).days + 1
+            if transaction.amount < 0:
+                daily_spending[transaction_day] += Decimal(transaction.amount)
+            else:
+                daily_credits[transaction_day] += Decimal(transaction.amount)
+
+        return {"debits": daily_spending, "credits": daily_credits}
+
+    def calc_cumulative(self, start_date, end_date):
+        start, end = self.format_start_end_dates(start_date, end_date)
+        both_daily_totals = self.calc_daily_totals(start_date=start, end_date=end)
+        results = {}
+
+        for transaction_type in ["debits", "credits"]:
+            daily_totals = both_daily_totals[transaction_type]
+            result = []
+            cumulative_total = 0
+            day_counter = 1
+            current_date = start
+            while current_date <= end:
+                cumulative_total += daily_totals[day_counter]
+                result.append(
+                    {
+                        "day": day_counter,
+                        "date": current_date.strftime("%m-%d-%Y"),
+                        f"daily_{transaction_type}": float(daily_totals[day_counter]),
+                        f"cumulative_{transaction_type}": float(cumulative_total),
+                    }
+                )
+                current_date += timedelta(days=1)
+                day_counter += 1
+
+            results[transaction_type] = result
+
+        return results
+
+    def format_start_end_dates(self, start_date, end_date):
+        return (datetime.strptime(date, "%Y-%m-%d") for date in [start_date, end_date])
+
 
 
 transaction_service = TransactionService()

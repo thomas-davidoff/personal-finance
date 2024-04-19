@@ -2,7 +2,7 @@ from utils import logger
 from collections import defaultdict
 from decimal import Decimal
 from datetime import datetime, timedelta
-from typing import Tuple, Dict
+from typing import Dict
 from app.utils import QueryFilter, get_start_and_end_from_month_year
 
 
