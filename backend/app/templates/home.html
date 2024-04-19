@@ -1,0 +1,27 @@
+<!-- home.html -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Home Page</title>
+</head>
+<body style="text-align: center">
+<h1>Thomas's Personal Finance App</h1>
+<h2>Main Routes</h2>
+<a href="{{ url_for('main_bp.welcome') }}">Welcome</a>
+<h2>Transaction Routes</h2>
+<a href="{{ url_for('transaction_bp.add_transaction') }}">Add Transaction</a>
+<a href="{{ url_for('transaction_bp.all_transactions') }}">Get All Transactions</a>
+<a href="{{ url_for('transaction_bp.cumulative_spending') }}">Cumulative Spending</a>
+<h2>Account Routes</h2>
+<a href="{{ url_for('account_bp.get_accounts') }}">Get Accounts</a>
+<h2>Category Routes</h2>
+<a href="{{ url_for('category_bp.get_all_categories') }}">Get All Categories</a>
+<a href="{{ url_for('category_bp.get_all_keywords') }}">Get All Keywords</a>
+<a href="{{ url_for('category_bp.categorize_all_transactions') }}">Categorize All Transactions</a>
+
+</body>
+</html>
