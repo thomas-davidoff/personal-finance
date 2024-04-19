@@ -1,69 +1,45 @@
-from app.repositories.repositories.transaction_DAO import transaction_dao
 from utils import logger
-from decimal import Decimal
-from app.utils import QueryFilter
+from app.repositories import transaction_repository
 
 
 class TransactionService:
     def __init__(self):
         logger.info("initializing transactions service")
 
-    @staticmethod
-    def get_transaction_by_id(transaction_id: int):
-        return transaction_dao.get_by_id(transaction_id)
+    def list_transactions(self, start_date, end_date):
 
-    @staticmethod
-    def get_transactions(query_filter=None):
-        transactions = transaction_dao.get_transactions(query_filter=query_filter)
-        return [
-            {
-                **tr.to_dict(ids=False),
-                "category": cat.name,
-                "account": acc.name,
-                "type": cat.transaction_type,
-            }
-            for tr, cat, acc in transactions
-        ]
+        if not start_date:
+            start_date = "1970-01-01"
 
-    @staticmethod
-    def add_transaction(transaction_data: dict):
-        return transaction_dao.create_transaction(transaction_data)
+        if not end_date:
+            end_date = "2038-01-01"
 
-    @staticmethod
-    def get_aggregate_by_category(filters):
-        return [
-            {
-                "total": float(Decimal(transaction.total).quantize(Decimal("0.00"))),
-                "category": transaction.category_name,
-                "transaction_type": transaction.transaction_type,
-            }
-            for transaction in transaction_dao.aggregate_by_category(filters=filters)
-        ]
+        all_transactions = transaction_repository.get_transactions(
+            start_date, end_date
+        ).all()
+        return [t.to_dict() for t in all_transactions]
 
-    @staticmethod
-    def get_aggregate_by_transaction_type(filters):
-        return [
-            {
-                "total": float(Decimal(transaction.total).quantize(Decimal("0.00"))),
-                "transaction_type": transaction.transaction_type,
-            }
-            for transaction in transaction_dao.aggregate_by_transaction_type(
-                filters=filters
-            )
-        ]
+    def add_transaction(self, description: str, amount: float, account_id: int, date: str):
+        transaction = transaction_repository.create_transaction(
+            {"description": description, "amount": amount, "account_id": account_id, "date": date}
+        )
+        return transaction.to_dict()
 
-    def bulk_update_transactions(self, transactions_data):
-        print(transactions_data)
-        updated_ids = []
-        for datum in transactions_data:
-            logger.debug(f"calling transaction dao to update transaction: {datum}")
-            updated_id = transaction_dao.update_transaction(
-                transaction_id=datum['transaction_id'],
-                new_description=datum.get('description'),
-                new_category_name=datum.get('category')
-            )
-            updated_ids.append(updated_id)
+    def get_transaction(self, transaction_id):
+        return transaction_repository.get_by_id(model_id=transaction_id).to_dict()
 
-        return updated_ids
+    def update_transaction(self, transaction_id, new_data):
+        transaction = transaction_repository.update_transaction(
+            transaction_id=transaction_id, new_transaction_data=new_data
+        )
+        print(transaction)
+        return transaction.to_dict()
+
+    def delete_transaction(self, transaction_id):
+        deleted_transaction_message = transaction_repository.delete_by_id(
+            model_id=transaction_id
+        )
+        return deleted_transaction_message
+
 
 transaction_service = TransactionService()

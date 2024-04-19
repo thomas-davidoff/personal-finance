@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from sqlalchemy import event
 
 
 class Transaction(db.Model):
@@ -7,23 +8,25 @@ class Transaction(db.Model):
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     description = db.Column(db.String(200), nullable=False)
     amount = db.Column(db.Float, nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=True)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False, default=1)
     account_id = db.Column(db.Integer, db.ForeignKey("account.id"), nullable=False)
+    account = db.relationship("Account", back_populates="transactions")
 
     def __repr__(self):
         return f"<Transaction {self.description} {self.amount}>"
 
-    def to_dict(self, ids=True):
+    def to_dict(self):
+        '''
+        # TODO: Returns a compact resource by default - must provide keys if wanting to expand
+        '''
         dic = {
             "id": self.id,
             "date": (
-                self.date.strftime('%m-%d-%Y') if self.date else None
-            ),  # convert datetime to a string
+                self.date.strftime("%m-%d-%Y") if self.date else None
+            ),
             "description": self.description,
             "amount": self.amount,
+            "account": {k:v for k,v in self.account.to_dict().items() if k in ['id', 'name']} if self.account else None,
+            "category": {k:v for k,v in self.category.to_dict().items() if k in ['id', 'name']} if self.category else None
         }
-        if ids:
-            dic.update(
-                {"account_id": self.account_id, "category_id": self.category_id}
-            )
         return dic

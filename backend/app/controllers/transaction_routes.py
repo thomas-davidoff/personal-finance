@@ -1,70 +1,56 @@
 from flask import Blueprint, request, jsonify
 from app.services.transaction_service import transaction_service
-from app.utils import get_start_and_end_from_month_year, QueryFilter
-from flask import abort
 
 transaction_bp = Blueprint("transaction_bp", __name__)
-ALLOWED_PARAMS = {
-    "month",
-    "year",
-    "category",
-    "transaction_type",
-}  # Define your allowed parameters
 
 
 @transaction_bp.route("/", methods=["GET"])
-def get_transactions():
-    # Check for unexpected parameters
-    unexpected_params = set(request.args.keys()) - ALLOWED_PARAMS
-    if unexpected_params:
-        abort(400, description=f"Unexpected parameters: {', '.join(unexpected_params)}")
-    month = request.args.get("month", type=int)
-    year = request.args.get("year", type=int)
-    category = request.args.get("category", type=str)
-    transaction_type = request.args.get("transaction_type", type=str)
-    if month and year:
-        query_filter = QueryFilter(
-            *get_start_and_end_from_month_year(int(month), int(year))
-        )
-    else:
-        query_filter = QueryFilter()
+def list_transactions():
 
-    if category:
-        query_filter.add_condition("category", category, "EQ")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
 
-    if transaction_type:
-        query_filter.add_condition("transaction_type", transaction_type, "EQ")
-
-    return transaction_service.get_transactions(query_filter)
-
-
-@transaction_bp.route("/add_transaction", methods=["POST"])
-def add_transaction():
-    created = transaction_service.add_transaction(transaction_data=request.get_json())
-    return (
-        jsonify({"message": f"Transaction added successfully with id {created}"}),
-        201,
+    return jsonify(
+        transaction_service.list_transactions(start_date=start_date, end_date=end_date)
     )
 
 
+@transaction_bp.route("/", methods=["POST"])
+def create_transaction():
+    new_transaction = transaction_service.add_transaction(
+        description=request.json.get("description"),
+        amount=request.json.get("amount"),
+        account_id=request.json.get("account_id"),
+    )
+    return jsonify(new_transaction), 201
+
+
 @transaction_bp.route("/<int:transaction_id>", methods=["GET"])
-def get_transaction(transaction_id):
-    return transaction_service.get_transaction_by_id(transaction_id).to_dict()
+def get_a_transaction(transaction_id):
+    transaction = transaction_service.get_transaction(transaction_id)
+    return jsonify(transaction), 200
 
 
-@transaction_bp.route("/bulk_update", methods=["PATCH"])
-def bulk_update_transactions():
-    # Parse the JSON payload
-    data = request.get_json()
+@transaction_bp.route("/list-by-account/<int:account_id>", methods=["GET"])
+def list_transactions_by_account(account_id):
+    return jsonify(transaction_service.list_transactions_by_account(account_id))
 
-    # Check if data is not None
-    if not data:
-        return jsonify({"error": "Empty request body"}), 400
 
-    bulk_update_data = [{"transaction_id": d.get('transactionId'), **d['changes']} for d in data]
-    try:
-        updated_ids = transaction_service.bulk_update_transactions(bulk_update_data)
-        # Respond back to the client
-        return jsonify({"message": "Bulk update payload received successfully"}), 200
-    except:
-        return jsonify({"error": "Something went wrong"}), 400
+@transaction_bp.route("/list-by-category/<int:category_id>", methods=["GET"])
+def list_transactions_by_category(category_id):
+    return jsonify(transaction_service.list_transactions_by_category(category_id))
+
+
+@transaction_bp.route("/<int:transaction_id>", methods=["PATCH"])
+def update_transaction(transaction_id):
+    new_transaction_data = request.json
+    transaction = transaction_service.update_transaction(
+        transaction_id=transaction_id, new_data=new_transaction_data
+    )
+    return jsonify(transaction)
+
+
+@transaction_bp.route("/<int:transaction_id>", methods=["DELETE"])
+def delete_account(transaction_id):
+    deleted_message = transaction_service.delete_transaction(transaction_id)
+    return deleted_message

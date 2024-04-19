@@ -1,5 +1,4 @@
 from utils import logger
-from app.services.transaction_service import transaction_service
 from collections import defaultdict
 from decimal import Decimal
 from datetime import datetime, timedelta

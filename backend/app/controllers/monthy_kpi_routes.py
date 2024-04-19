@@ -6,11 +6,6 @@ from app.services.monthly_kpi_service import monthly_kpi_service
 
 monthly_kpi_bp = Blueprint("monthly_kpi_bp", __name__)
 
-#
-# @monthly_kpi_bp.route("/", methods=["GET"])
-# def welcome():
-#     return "welcome to the kpis api"
-
 
 @monthly_kpi_bp.route("/cumulative", methods=["GET"])
 def cumulative_monthly_spending():

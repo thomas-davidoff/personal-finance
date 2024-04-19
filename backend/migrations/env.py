@@ -4,14 +4,21 @@ from sqlalchemy import pool
 from alembic import context
 from flask import current_app
 from app import app as my_flask_app, db  # Import your Flask app and db
-from app.models import transaction, budget, account, category # import all models to register with alembic
+from app.models import (
+    transaction,
+    budget,
+    account,
+    category,
+)  # import all models to register with alembic
 
 my_flask_app.app_context().push()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option('sqlalchemy.url', my_flask_app.config.get('SQLALCHEMY_DATABASE_URI'))
+config.set_main_option(
+    "sqlalchemy.url", my_flask_app.config.get("SQLALCHEMY_DATABASE_URI")
+)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -23,11 +30,6 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = db.metadata
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def run_migrations_offline() -> None:
@@ -48,6 +50,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_as_batch=True,
     )
 
     with context.begin_transaction():
@@ -69,7 +72,7 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, target_metadata=target_metadata, render_as_batch=True
         )
 
         with context.begin_transaction():
