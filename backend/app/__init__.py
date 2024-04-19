@@ -10,7 +10,7 @@ app.config.from_object("app.config.Config")
 db = SQLAlchemy(app)
 
 # Import models so that they are registered with SQLAlchemy
-from app.models import Transaction, Account, Category, Budget, Keyword
+from app.models import Transaction, Account, Category, Keyword
 
 # Import controllers
 from app.controllers import (

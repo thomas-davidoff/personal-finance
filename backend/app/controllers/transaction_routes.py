@@ -54,3 +54,9 @@ def update_transaction(transaction_id):
 def delete_account(transaction_id):
     deleted_message = transaction_service.delete_transaction(transaction_id)
     return deleted_message
+
+
+@transaction_bp.route('/cumulative-spending', methods=['GET'])
+def get_cumulative_spending():
+    cumul_spending = transaction_service.calc_cumulative(start_date=request.args.get('start'), end_date=request.args.get('end'))
+    return jsonify(cumul_spending), 200
