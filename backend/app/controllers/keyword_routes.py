@@ -29,9 +29,9 @@ def create_keyword():
 def delete_keyword(keyword_id):
     try:
         message = category_service.delete_keyword(keyword_id)
-        return jsonify({'message': message}), 200
+        return jsonify({"message": message}), 200
     except AssertionError as e:
-        return jsonify({'message': str(e)}), 404
+        return jsonify({"message": str(e)}), 404
 
 
 @keyword_bp.route("/<int:keyword_id>", methods=["GET"])

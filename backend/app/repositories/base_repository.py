@@ -17,11 +17,17 @@ class BaseRepository:
                     print(filter_value)
                     query = query.filter(func.upper(attr).in_(filter_value))
                 else:
-                    query = query.filter(func.upper(attr)==filter_value)
+                    query = query.filter(func.upper(attr) == filter_value)
         return query
 
     def get_by_id(self, model_id):
-        return self.db_session.query(self.model).get(model_id)
+        record = self.db_session.query(self.model).get(model_id)
+        if not record:
+            raise RecordDoesNotExist(
+                f"{self.model.__name__.replace('_', ' ').capitalize()} with id {model_id} does not exist.",
+                404,
+            )
+        return record
 
     def update_by_id(self, model_id, new_data):
         record = self.db_session.query(self.model).get(model_id)
@@ -29,11 +35,11 @@ class BaseRepository:
             setattr(record, attribute, new_value)
             self.db_session.commit()
         return record
-    
+
     def delete_by_id(self, model_id):
         record = self.db_session.query(self.model).get(model_id)
         if not record:
-            raise RecordDoesNotExist(f'Record with id {model_id} does not exist.', 404)
+            raise RecordDoesNotExist(f"Record with id {model_id} does not exist.", 404)
         self.db_session.delete(record)
         self.db_session.commit()
-        return f'Record with id {model_id} deleted successfully.'
+        return {"message": f"Record with id {model_id} deleted successfully."}
