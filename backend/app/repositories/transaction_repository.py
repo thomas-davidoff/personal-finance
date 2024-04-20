@@ -1,5 +1,5 @@
 from app.models import Transaction
-from sqlalchemy import between
+from sqlalchemy import between, func, case
 from app.repositories.base_repository import BaseRepository
 
 
@@ -7,8 +7,16 @@ class TransactionRepository(BaseRepository):
     def __init__(self, db_session) -> None:
         super().__init__(db_session=db_session, model=Transaction)
 
+    def _start_date(self, start=None):
+        return start or "1970-01-01"
+
     def get_transactions(
-        self, start_date=None, end_date=None, account_id=None, category_id=None, filters: dict={}
+        self,
+        start_date=None,
+        end_date=None,
+        account_id=None,
+        category_id=None,
+        filters: dict = {},
     ) -> Transaction.query_class:
 
         if start_date is None:
@@ -44,3 +52,20 @@ class TransactionRepository(BaseRepository):
 
     def update_transaction(self, transaction_id, new_transaction_data) -> Transaction:
         return self.update_by_id(transaction_id, new_transaction_data)
+
+    def get_grouped_transactions(self, start, end):
+        transactions = (
+            self.db_session.query(
+                Transaction.category_id,
+                func.sum(
+                    case((Transaction.amount < 0, Transaction.amount), else_=0)
+                ).label("total_debits"),
+                func.sum(
+                    case((Transaction.amount > 0, Transaction.amount), else_=0)
+                ).label("total_credits"),
+                func.count(Transaction.id).label("num_transactions"),
+            )
+            .filter(Transaction.date.between(start, end))
+            .group_by(Transaction.category_id)
+        )
+        return transactions

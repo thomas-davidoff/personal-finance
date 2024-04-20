@@ -1,5 +1,5 @@
 from utils import logger
-from app.repositories import transaction_repository
+from app.repositories import transaction_repository, category_repository
 from collections import defaultdict
 from decimal import Decimal
 from datetime import datetime, timedelta
@@ -97,8 +97,26 @@ class TransactionService:
         return results
 
     def format_start_end_dates(self, start_date, end_date):
+        if not start_date:
+            start_date = "1970-01-01"
+        if not end_date:
+            end_date = "2038-01-01"
+
         return (datetime.strptime(date, "%Y-%m-%d") for date in [start_date, end_date])
 
+    def get_aggregate_by_category(self, start, end):
+        start, end = self.format_start_end_dates(start_date=start, end_date=end)
+        transactions = transaction_repository.get_grouped_transactions(start, end)
+        return [
+            {
+                "category_id": c.category_id,
+                "category_name": category_repository.get_by_id(c.category_id).name,
+                "total_debits": c.total_debits,
+                "total_credits": c.total_credits,
+                "num_transactions": c.num_transactions,
+            }
+            for c in transactions.all()
+        ]
 
 
 transaction_service = TransactionService()

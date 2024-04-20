@@ -18,7 +18,7 @@ def create_keyword():
 
     keyword = category_service.add_keyword(
         keyword=keyword_data.get("keyword"),
-        category_name=keyword_data.get("category"),
+        category_id=keyword_data.get("category_id"),
         label=keyword_data.get("label"),
     )
 

@@ -7,8 +7,8 @@ transaction_bp = Blueprint("transaction_bp", __name__)
 @transaction_bp.route("/", methods=["GET"])
 def list_transactions():
 
-    start_date = request.args.get("start_date")
-    end_date = request.args.get("end_date")
+    start_date = request.args.get("start")
+    end_date = request.args.get("end")
 
     return jsonify(
         transaction_service.list_transactions(start_date=start_date, end_date=end_date)
@@ -56,7 +56,17 @@ def delete_account(transaction_id):
     return deleted_message
 
 
-@transaction_bp.route('/cumulative-spending', methods=['GET'])
+@transaction_bp.route("/cumulative-spending", methods=["GET"])
 def get_cumulative_spending():
-    cumul_spending = transaction_service.calc_cumulative(start_date=request.args.get('start'), end_date=request.args.get('end'))
+    cumul_spending = transaction_service.calc_cumulative(
+        start_date=request.args.get("start"), end_date=request.args.get("end")
+    )
     return jsonify(cumul_spending), 200
+
+
+@transaction_bp.route("/aggregate")
+def get_aggregate_by_category():
+    result = transaction_service.get_aggregate_by_category(
+        start=request.args.get("start"), end=request.args.get("end")
+    )
+    return jsonify(result), 200

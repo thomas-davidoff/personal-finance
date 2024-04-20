@@ -7,10 +7,10 @@ class Account(db.Model):
     current_balance = db.Column(db.Float, nullable=False, default=0)
     starting_balance = db.Column(db.Float, nullable=False, default=0)
     account_type = db.Column(db.String(50))
-    transactions = db.relationship('Transaction', back_populates='account')
+    transactions = db.relationship("Transaction", back_populates="account")
 
     def __repr__(self):
-        return f'<Account {self.name} Type: {self.account_type} Balance: {self.current_balance}>'
+        return f"<Account {self.name} Type: {self.account_type} Balance: {self.current_balance}>"
 
     def to_dict(self):
         return {
