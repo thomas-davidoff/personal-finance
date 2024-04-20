@@ -2,13 +2,12 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
-from flask import current_app
 from app import app as my_flask_app, db  # Import your Flask app and db
 from app.models import (
-    transaction,
-    budget,
-    account,
-    category,
+    Transaction,
+    Account,
+    Category,
+    Keyword,
 )  # import all models to register with alembic
 
 my_flask_app.app_context().push()
