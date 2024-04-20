@@ -64,9 +64,11 @@ class MonthlyKPIService:
             field="transaction_type", value=["account transfer"], operator="NOT_IN"
         )
 
-        aggregate_by_category = transaction_service.get_aggregate_by_category(query_filter)
-        aggregate_by_transaction_type = transaction_service.get_aggregate_by_transaction_type(
+        aggregate_by_category = transaction_service.get_aggregate_by_category(
             query_filter
+        )
+        aggregate_by_transaction_type = (
+            transaction_service.get_aggregate_by_transaction_type(query_filter)
         )
         return aggregate_by_category, aggregate_by_transaction_type
 

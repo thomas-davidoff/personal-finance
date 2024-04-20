@@ -2,6 +2,7 @@ from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 from app.exceptions import RecordDoesNotExist
 
+
 class BaseRepository:
     def __init__(self, model, db_session) -> None:
         self.db_session: Session = db_session

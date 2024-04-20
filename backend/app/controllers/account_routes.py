@@ -9,7 +9,6 @@ account_bp = Blueprint("account_bp", __name__)
 account_service = AccountService()
 
 
-
 @account_bp.route("/", methods=["GET"])
 def list_accounts():
     accounts = account_service.get_all_accounts()
@@ -47,14 +46,14 @@ def get_running_balance(account_id):
 def create_account():
     account_data = request.json
     account = account_service.create_account(
-        account_name=account_data.get('account_name'),
+        account_name=account_data.get("account_name"),
         account_type=account_data.get("account_type"),
         starting_balance=account_data.get("starting_balance"),
     )
     return jsonify(account), 201
 
 
-@account_bp.route('/<int:account_id>', methods=['DELETE'])
+@account_bp.route("/<int:account_id>", methods=["DELETE"])
 def delete_account(account_id):
     deleted_message = account_service.delete_account(account_id)
     return deleted_message

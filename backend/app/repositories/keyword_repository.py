@@ -11,18 +11,17 @@ class KeywordRepository(BaseRepository):
 
     def get_all_keywords(self) -> Keyword.query_class:
         return self._get_all_with_filter()
-    
+
     def create_keyword(self, keyword, label, category_id) -> Keyword:
         keyword = Keyword(keyword=keyword, category_id=category_id, label=label)
         self.db_session.add(keyword)
         self.db_session.commit()
         return keyword
-    
+
     def delete_keyword(self, keyword_id):
 
         keyword = self.db_session.query(Keyword).get(keyword_id)
-        assert keyword, f'Item with ID {keyword_id} not found.'
+        assert keyword, f"Item with ID {keyword_id} not found."
         self.db_session.delete(keyword)
         self.db_session.commit()
-        return f'Item with id {keyword_id} deleted successfully.'
-        
+        return f"Item with id {keyword_id} deleted successfully."

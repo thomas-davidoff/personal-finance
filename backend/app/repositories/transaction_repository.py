@@ -17,7 +17,6 @@ class TransactionRepository(BaseRepository):
         if end_date is None:
             end_date = "2038-01-01"
 
-        base_query = self._get_all_with_filter()
         if filters:
             pass
 
@@ -26,13 +25,9 @@ class TransactionRepository(BaseRepository):
         )
 
         if account_id:
-            transactions = transactions.filter_by(
-                account_id=account_id
-            )
+            transactions = transactions.filter_by(account_id=account_id)
         if category_id:
-            transactions = transactions.filter_by(
-                category_id=category_id
-            )
+            transactions = transactions.filter_by(category_id=category_id)
 
         return transactions.order_by(Transaction.date)
 
