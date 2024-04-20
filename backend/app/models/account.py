@@ -19,6 +19,5 @@ class Account(db.Model):
             "current_balance": self.current_balance,
             "starting_balance": self.starting_balance,
             "account_type": self.account_type,
-            "num_transactions": len(self.transactions)
+            "num_transactions": len(self.transactions),
         }
-    

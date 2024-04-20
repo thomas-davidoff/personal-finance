@@ -21,7 +21,7 @@ class CategoryService:
     def list_transactions(self, category_id):
         category = category_repository.get_category(category_id=category_id)
         assert category, "Category not found"
-        return [t.to_dict() for t in category.categorized_transactions]
+        return [t.to_dict() for t in category.transactions]
 
     def get_category(self, category_id=None, category_name=None):
         if isinstance(category_name, str):
@@ -106,7 +106,6 @@ class CategoryService:
 
     def get_keyword(self, keyword_id) -> dict:
         return keyword_repository.get_by_id(model_id=keyword_id).to_dict()
-    
 
     def delete_category(self, category_id):
         deleted_transaction_message = category_repository.delete_by_id(

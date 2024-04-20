@@ -4,18 +4,19 @@ import logging
 from colorama import Fore, Style
 
 
-
 class CustomFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
 
-    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    format = (
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    )
 
     FORMATS = {
         logging.DEBUG: Fore.CYAN + format + Style.RESET_ALL,
         logging.INFO: Fore.GREEN + format + Style.RESET_ALL,
         logging.WARNING: Fore.YELLOW + format + Style.RESET_ALL,
         logging.ERROR: Fore.RED + format + Style.RESET_ALL,
-        logging.CRITICAL: Fore.RED + Style.BRIGHT + format + Style.RESET_ALL
+        logging.CRITICAL: Fore.RED + Style.BRIGHT + format + Style.RESET_ALL,
     }
 
     def format(self, record):
@@ -34,7 +35,7 @@ def setup_logger():
 
 
 setup_logger()
-log_name = 'finance'
+log_name = "finance"
 logger = logging.getLogger(log_name)
 
-logger.debug(f'initializing log as {log_name}')
+logger.debug(f"initializing log as {log_name}")

@@ -28,4 +28,3 @@ app.register_blueprint(account_bp, url_prefix="/accounts")
 app.register_blueprint(category_bp, url_prefix="/categories")
 app.register_blueprint(monthly_kpi_bp, url_prefix="/monthly_kpis")
 app.register_blueprint(keyword_bp, url_prefix="/keywords")
-

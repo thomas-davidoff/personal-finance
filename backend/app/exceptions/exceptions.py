@@ -17,11 +17,8 @@ class CustomException(Exception):
         return rv
 
 
-
 class RecordDoesNotExist(CustomException):
     status_code = 404
 
     def __init__(self, message, status_code=None, payload=None) -> None:
-        super().__init__(
-            message=message, status_code=status_code, payload=payload
-        )
+        super().__init__(message=message, status_code=status_code, payload=payload)

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 class QueryFilter:
     def __init__(self, start_date=None, end_date=None):
         self.start_date = start_date or datetime(1970, 1, 1)

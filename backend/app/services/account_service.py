@@ -89,7 +89,7 @@ class AccountService:
             }
         )
         return account.to_dict()
-    
+
     def delete_account(self, account_id):
         deleted_account_message = account_repository.delete_by_id(model_id=account_id)
         return deleted_account_message
