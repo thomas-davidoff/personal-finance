@@ -116,3 +116,9 @@ class CategoryService:
     def add_category(self, data):
         category = category_repository.create_category(data)
         return category.to_dict()
+
+    def update_category(self, category_id, data):
+        updated_category = category_repository.update_by_id(
+            model_id=category_id, new_data=data
+        )
+        return updated_category.to_dict()

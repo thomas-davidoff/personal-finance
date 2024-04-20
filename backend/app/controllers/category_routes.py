@@ -58,3 +58,8 @@ def create_category():
         }
     )
     return jsonify(new_category), 201
+
+
+@category_bp.route("/<int:category_id>", methods=["PATCH"])
+def update_category(category_id):
+    return category_service.update_category(category_id, request.json)
