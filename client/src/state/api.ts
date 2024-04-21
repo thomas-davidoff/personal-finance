@@ -1,75 +1,78 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import {
-  GetKpisResponse,
-  GetProductsResponse,
-  getMonthlyExpensesResponse,
-  GetMonthlyTransactionsResponse,
-  GetAllCategoriesResponse,
-  BulkUpdatePayload,
-  GetMonthlyKPIsResponse,
-} from '@/state/types'
+  Account,
+  Transaction,
+  CategoryReponse,
+  UserTransactionPatch,
+} from "@/state/types"
 
 export const api = createApi({
-  baseQuery: fetchBaseQuery({baseUrl: '/api/'}),
-  reducerPath: 'main',
+  baseQuery: fetchBaseQuery({ baseUrl: "/api/" }),
+  reducerPath: "main",
   tagTypes: [
-    'Kpis',
-    'Products',
-    'Transactions',
-    'MonthlyExpenses',
-    'AllCategories',
-    'MonthlyKPIs',
+    "AllAccounts",
+    "AllTransactions",
+    "SingleTransaction",
+    "AllCategories",
   ],
-  endpoints: build => ({
-    getKpis: build.query<Array<GetKpisResponse>, void>({
-      query: () => 'kpi/kpis/',
-      providesTags: ['Kpis'],
+  endpoints: (build) => ({
+    getAccounts: build.query<Array<Account>, void>({
+      query: () => "accounts/",
+      providesTags: ["AllAccounts"],
     }),
-    getProducts: build.query<Array<GetProductsResponse>, void>({
-      query: () => 'product/products/',
-      providesTags: ['Products'],
-    }),
-    getMonthlyExpenses: build.query<Array<getMonthlyExpensesResponse>, void>({
-      query: () => 'monthly_expenses/',
-      providesTags: ['MonthlyExpenses'],
-    }),
-    getMonthlyTransactions: build.query<
-      Array<GetMonthlyTransactionsResponse>,
-      {month: string; year: string; category: string; transactionType: string}
+    getTransactions: build.query<
+      Array<Transaction>,
+      { start?: string; end?: string }
     >({
-      query: args =>
-        `transactions/?month=${args.month}&year=${args.year}&category=${args.category}&transaction_type=${args.transactionType}`,
-      providesTags: ['Transactions'],
+      query: (args) => `transactions/?start=${args.start}&end=${args.end}`,
+      providesTags: ["AllTransactions"],
     }),
-    getMonthlyKPIs: build.query<
-      GetMonthlyKPIsResponse,
-      {month: string; year: string}
-    >({
-      query: args =>
-        `monthly_kpis/?month=${args.month}&year=${args.year}`,
-      providesTags: ['MonthlyKPIs'],
-    }),
-    getCategories: build.query<Array<GetAllCategoriesResponse>, void>({
-      query: () => 'categories/',
-      providesTags: ['AllCategories'],
-    }),
-    bulkUpdateTransactions: build.mutation<void, BulkUpdatePayload>({
-      query: bulkUpdateData => ({
-        url: 'transactions/bulk_update',
-        method: 'PATCH',
-        body: bulkUpdateData,
+    createTransaction: build.mutation<Transaction, UserTransactionPatch>({
+      query: (transactionData) => ({
+        url: "transactions/",
+        method: "POST",
+        body: transactionData,
       }),
-      invalidatesTags: ['Transactions'],
+      invalidatesTags: ["AllTransactions"],
+    }),
+    deleteTransaction: build.mutation<void, number>({
+      query: (transactionId) => ({
+        url: `transactions/${transactionId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["AllTransactions"],
+    }),
+    getTransaction: build.query<Transaction, number>({
+      query: (transactionId) => ({
+        url: `transactions/${transactionId}`,
+        providesTags: ["SingleTransaction"],
+      }),
+    }),
+    updateTransaction: build.mutation<Transaction, updateTransactionProps>({
+      query: ({ transactionId, transactionData }) => ({
+        url: `transactions/${transactionId}`,
+        method: "PATCH",
+        body: transactionData,
+      }),
+    }),
+    getCategories: build.query<Array<CategoryReponse>, void>({
+      query: () => "categories/",
+      providesTags: ["AllCategories"],
     }),
   }),
 })
 
+interface updateTransactionProps {
+  transactionId: number
+  transactionData: UserTransactionPatch
+}
+
 export const {
-  useGetKpisQuery,
-  useGetProductsQuery,
-  useGetMonthlyExpensesQuery,
-  useGetMonthlyTransactionsQuery,
+  useGetAccountsQuery,
+  useGetTransactionsQuery,
+  useCreateTransactionMutation,
+  useDeleteTransactionMutation,
+  useGetTransactionQuery,
   useGetCategoriesQuery,
-  useBulkUpdateTransactionsMutation,
-  useGetMonthlyKPIsQuery,
+  useUpdateTransactionMutation,
 } = api

@@ -139,3 +139,47 @@ export interface GetMonthlyKPIsResponse {
   aggregate_by_transaction_type: AggregateByTransactionTypeItem[]
   cumulative_spending: GetMonthlyCumulativeSpendingResponse[]
 }
+
+export interface Account {
+  account_type?: string
+  current_balance?: number
+  id: number
+  name?: string
+  num_transactions?: number
+  starting_balance?: number
+}
+
+export interface Category {
+  id: number
+  name?: string
+  description?: string
+  num_transactions?: number
+  transaction_type?: string
+  transaction_subtype?: string
+}
+
+export interface CategoryReponse {
+  id: number
+  name: string
+  description: string
+  num_transactions: number
+  transaction_type: string
+  transaction_subtype: string
+}
+
+export interface Transaction {
+  account: Account
+  amount: number
+  category?: Category
+  date: string
+  description: string
+  id?: number
+}
+
+export interface UserTransactionPatch {
+  account_id: number
+  category_id: number
+  date: string
+  description: string
+  amount: number
+}
