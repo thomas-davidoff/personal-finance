@@ -17,11 +17,7 @@ def list_transactions():
 
 @transaction_bp.route("/", methods=["POST"])
 def create_transaction():
-    new_transaction = transaction_service.add_transaction(
-        description=request.json.get("description"),
-        amount=request.json.get("amount"),
-        account_id=request.json.get("account_id"),
-    )
+    new_transaction = transaction_service.add_transaction(new_data=request.json)
     return jsonify(new_transaction), 201
 
 
@@ -51,7 +47,7 @@ def update_transaction(transaction_id):
 
 
 @transaction_bp.route("/<int:transaction_id>", methods=["DELETE"])
-def delete_account(transaction_id):
+def delete_transaction(transaction_id):
     deleted_message = transaction_service.delete_transaction(transaction_id)
     return deleted_message
 

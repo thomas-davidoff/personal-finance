@@ -3,6 +3,7 @@ from app.repositories import transaction_repository, category_repository
 from collections import defaultdict
 from decimal import Decimal
 from datetime import datetime, timedelta
+from app.exceptions import ValidationError
 
 
 class TransactionService:
@@ -22,16 +23,9 @@ class TransactionService:
         ).all()
         return [t.to_dict() for t in all_transactions]
 
-    def add_transaction(
-        self, description: str, amount: float, account_id: int, date: str
-    ):
+    def add_transaction(self, new_data):
         transaction = transaction_repository.create_transaction(
-            {
-                "description": description,
-                "amount": amount,
-                "account_id": account_id,
-                "date": date,
-            }
+            {**new_data, "date": self._format_date(new_data["date"])}
         )
         return transaction.to_dict()
 
@@ -40,7 +34,11 @@ class TransactionService:
 
     def update_transaction(self, transaction_id, new_data):
         transaction = transaction_repository.update_transaction(
-            transaction_id=transaction_id, new_transaction_data=new_data
+            transaction_id=transaction_id,
+            new_transaction_data={
+                **new_data,
+                "date": self._format_date(new_data["date"]),
+            },
         )
         print(transaction)
         return transaction.to_dict()
@@ -96,13 +94,16 @@ class TransactionService:
 
         return results
 
+    def _format_date(self, date_string):
+        return datetime.strptime(date_string, "%Y-%m-%d")
+
     def format_start_end_dates(self, start_date, end_date):
         if not start_date:
             start_date = "1970-01-01"
         if not end_date:
             end_date = "2038-01-01"
 
-        return (datetime.strptime(date, "%Y-%m-%d") for date in [start_date, end_date])
+        return (self._format_date(date) for date in [start_date, end_date])
 
     def get_aggregate_by_category(self, start, end):
         start, end = self.format_start_end_dates(start_date=start, end_date=end)

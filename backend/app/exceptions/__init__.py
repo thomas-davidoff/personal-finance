@@ -1,6 +1,6 @@
 from app import app
 from flask import jsonify
-from .exceptions import RecordDoesNotExist
+from .exceptions import RecordDoesNotExist, ValidationError
 from sqlalchemy.exc import IntegrityError
 from utils import logger
 import re
@@ -26,3 +26,10 @@ def handle_integrity_error(error: IntegrityError):
             jsonify(error="An unexpected database error occurred. Please try again."),
             400,
         )
+
+
+@app.errorhandler(ValidationError)
+def handle_record_does_not_exist(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response

@@ -22,3 +22,11 @@ class RecordDoesNotExist(CustomException):
 
     def __init__(self, message, status_code=None, payload=None) -> None:
         super().__init__(message=message, status_code=status_code, payload=payload)
+
+
+class ValidationError(CustomException):
+
+    status_code = 403
+
+    def __init__(self, message, status_code=None, payload=None) -> None:
+        super().__init__(message=message, status_code=status_code, payload=payload)

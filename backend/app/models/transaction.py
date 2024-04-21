@@ -24,7 +24,7 @@ class Transaction(db.Model):
         """
         dic = {
             "id": self.id,
-            "date": (self.date.strftime("%m-%d-%Y") if self.date else None),
+            "date": (self.date.strftime("%Y-%m-%d") if self.date else None),
             "description": self.description,
             "amount": self.amount,
             "account": (
