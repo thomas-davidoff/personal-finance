@@ -1,6 +1,6 @@
 import BoxHeader from "@/components/BoxHeader"
 import DashboardBox from "@/components/DashboardBox"
-import { useGetMonthlyKPIsQuery } from "@/state/api"
+// import { useGetMonthlyKPIsQuery } from "@/state/api"
 import { useTheme } from "@mui/material"
 import { useMemo } from "react"
 import {
@@ -36,10 +36,12 @@ const Row1 = ({
   setSelectedYear,
 }: Props) => {
   const { palette } = useTheme()
-  const { data } = useGetMonthlyKPIsQuery({
-    month: selectedMonth, // selectedMonth
-    year: selectedYear, // selectedYear
-  })
+  // const { data } = {useGetMonthlyKPIsQuery({
+  //   month: selectedMonth, // selectedMonth
+  //   year: selectedYear, // selectedYear
+  // })}
+
+  const data = [{}]
 
   console.log(data)
 
