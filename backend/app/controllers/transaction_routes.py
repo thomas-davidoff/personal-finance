@@ -66,3 +66,13 @@ def get_aggregate_by_category():
         start=request.args.get("start"), end=request.args.get("end")
     )
     return jsonify(result), 200
+
+
+@transaction_bp.route("/common-uncategorized-words")
+def find_common_uncategorized_words():
+    result = transaction_service.find_most_common_descriptions(
+        min_consecutive=request.args.get("min_consecutive"),
+        min_word_length=request.args.get("min_word_length"),
+        ignore_words=request.args.get("ignore_words"),
+    )
+    return jsonify(result, 200)
