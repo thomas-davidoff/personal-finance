@@ -1,9 +1,10 @@
 from utils import logger
 from app.repositories import transaction_repository, category_repository
-from collections import defaultdict
+from collections import defaultdict, Counter
 from decimal import Decimal
 from datetime import datetime, timedelta
 from app.exceptions import ValidationError
+import re
 
 
 class TransactionService:
@@ -118,6 +119,91 @@ class TransactionService:
             }
             for c in transactions.all()
         ]
+
+    def find_most_common_descriptions(
+        self, min_consecutive, min_word_length, ignore_words
+    ):
+
+        ignore_list = [w.strip().lower() for w in ignore_words.split(",")]
+
+        min_consecutive = int(min_consecutive) or 1
+        min_word_length = int(min_word_length) or 3
+
+        all_uncategorized = transaction_repository.get_transactions(category_id=1)
+        normalized_descriptions = [
+            {
+                "transaction": transaction,
+                "normalized_description": re.sub(
+                    "[^a-zA-Z]+", "*", transaction.description
+                ).lower(),
+            }
+            for transaction in all_uncategorized
+        ]
+
+        place = Counter()
+        associations_store = {}
+        for datum in normalized_descriptions:
+            transaction = datum["transaction"]
+            sentence = datum["normalized_description"]
+            words = [w.strip() for w in sentence.split("*")]
+            words = [
+                w for w in words if w not in ignore_list and len(w) >= min_word_length
+            ]
+            patterns = []
+            i = 0
+            while (i + min_consecutive - 1) < len(words):
+                consecutive_list = []
+                for index in range(0, min_consecutive):
+                    consecutive_list.append(words[index + i])
+                joined = "|".join(consecutive_list)
+                patterns.append(joined)
+                if joined not in associations_store:
+                    associations_store[joined] = [transaction.to_dict()]
+                else:
+                    associations_store[joined].append(transaction.to_dict())
+                i += 1
+
+            place.update(patterns)
+
+        top_20_words = place.most_common(20)
+
+        result = []
+        for phrase, count in top_20_words:
+            unique_transactions = Counter()
+            transactions = associations_store[phrase]
+            total_amount = sum([t["amount"] for t in transactions])
+            avg_amount = total_amount / len(transactions)
+
+            transaction_keys = [
+                "*****".join(
+                    [
+                        "description$$$" + re.sub(" +", " ", t["description"]),
+                        "category$$$" + t["category"]["name"],
+                        "account$$$" + t["account"]["name"],
+                    ]
+                )
+                for t in transactions
+            ]
+            unique_transactions.update(transaction_keys)
+            result.append(
+                {
+                    "phrase": phrase,
+                    "count": count,
+                    "avg_amount": avg_amount,
+                    "total_amount": total_amount,
+                    "combos": [
+                        {
+                            "count": count,
+                            "key": {
+                                text.split("$$$")[0]: text.split("$$$")[1]
+                                for text in desc.split("*****")
+                            },
+                        }
+                        for desc, count in unique_transactions.most_common(5)
+                    ],
+                }
+            )
+        return result
 
 
 transaction_service = TransactionService()
