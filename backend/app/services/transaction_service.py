@@ -109,16 +109,38 @@ class TransactionService:
     def get_aggregate_by_category(self, start, end):
         start, end = self.format_start_end_dates(start_date=start, end_date=end)
         transactions = transaction_repository.get_grouped_transactions(start, end)
-        return [
+        grouped = [
             {
+                "month": c.month,
                 "category_id": c.category_id,
                 "category_name": category_repository.get_by_id(c.category_id).name,
                 "total_debits": c.total_debits,
-                "total_credits": c.total_credits,
                 "num_transactions": c.num_transactions,
             }
             for c in transactions.all()
         ]
+
+        categories = {g.get("category_name") for g in grouped}
+        months = {g.get("month") for g in grouped}
+
+        def find_value_in_groups(groups, month, category_name):
+            for group in groups:
+                print(group)
+                if group["month"] == month and category_name in group.values():
+                    return round(group["total_debits"], 2) * -1
+            return 0
+
+        grouped_by_months = [
+            {
+                "month": month,
+                **{
+                    category: find_value_in_groups(grouped, month, category)
+                    for category in categories
+                },
+            }
+            for month in months
+        ]
+        return grouped_by_months
 
     def find_most_common_descriptions(
         self, min_consecutive, min_word_length, ignore_words, number_to_return

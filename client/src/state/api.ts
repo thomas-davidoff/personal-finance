@@ -27,6 +27,7 @@ export const api = createApi({
     "AllKeywords",
     "CommonDescriptionWords",
     "SingleCategory",
+    "AggregatedTransactionsByCategory",
   ],
   endpoints: (build) => ({
     getAccounts: build.query<Array<Account>, void>({

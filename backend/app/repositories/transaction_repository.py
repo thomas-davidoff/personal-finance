@@ -1,5 +1,5 @@
 from app.models import Transaction
-from sqlalchemy import between, func, case
+from sqlalchemy import extract, func, case
 from app.repositories.base_repository import BaseRepository
 
 
@@ -56,16 +56,14 @@ class TransactionRepository(BaseRepository):
     def get_grouped_transactions(self, start, end):
         transactions = (
             self.db_session.query(
+                extract("month", Transaction.date).label("month"),
                 Transaction.category_id,
                 func.sum(
                     case((Transaction.amount < 0, Transaction.amount), else_=0)
                 ).label("total_debits"),
-                func.sum(
-                    case((Transaction.amount > 0, Transaction.amount), else_=0)
-                ).label("total_credits"),
                 func.count(Transaction.id).label("num_transactions"),
             )
-            .filter(Transaction.date.between(start, end))
-            .group_by(Transaction.category_id)
+            .filter(Transaction.date.between(start, end), Transaction.amount < 0)
+            .group_by(extract("month", Transaction.date), Transaction.category_id)
         )
         return transactions
