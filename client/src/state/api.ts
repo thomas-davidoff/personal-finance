@@ -154,8 +154,49 @@ export const api = createApi({
         providesTags: ["SingleCategory"],
       }),
     }),
+    getAggregatedTransactionsByCategory: build.query<
+      AggregatedTransactionsByCategoryResponse[],
+      StartEndDateParams
+    >({
+      query: ({ startDate, endDate }) => ({
+        url: `transactions/aggregate?start=${startDate}&end=${endDate}`,
+        providesTags: ["AggregatedTransactionsByCategory"],
+      }),
+    }),
+    getAccountRunningBalance: build.query<
+      GetAccountRunningBalanceResponse[],
+      GetAccountRunningBalanceParams
+    >({
+      query: ({ startDate, endDate }) => ({
+        url: `accounts/running_balances?start=${startDate}&end=${endDate}`,
+      }),
+    }),
   }),
 })
+
+interface GetAccountRunningBalanceParams {
+  startDate?: string
+  endDate?: string
+}
+
+interface GetAccountRunningBalanceResponse {
+  date: string
+  [key: string]: string | number
+}
+
+interface StartEndDateParams {
+  startDate?: string
+  endDate?: string
+}
+
+interface AggregatedTransactionsByCategoryResponse {
+  category_id: number
+  category_name: string
+  num_transactions: number
+  total_credits: number
+  total_debits: number
+  month: number
+}
 
 export const {
   useGetAccountsQuery,
@@ -175,4 +216,6 @@ export const {
   useDeleteCategoryMutation,
   useUpdateCategoryMutation,
   useGetCategoryQuery,
+  useGetAggregatedTransactionsByCategoryQuery,
+  useGetAccountRunningBalanceQuery,
 } = api
