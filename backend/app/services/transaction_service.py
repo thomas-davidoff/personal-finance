@@ -121,13 +121,14 @@ class TransactionService:
         ]
 
     def find_most_common_descriptions(
-        self, min_consecutive, min_word_length, ignore_words
+        self, min_consecutive, min_word_length, ignore_words, number_to_return
     ):
 
         ignore_list = [w.strip().lower() for w in ignore_words.split(",")]
 
         min_consecutive = int(min_consecutive) or 1
         min_word_length = int(min_word_length) or 3
+        number_to_return = int(number_to_return) or 20
 
         all_uncategorized = transaction_repository.get_transactions(category_id=1)
         normalized_descriptions = [
@@ -165,7 +166,7 @@ class TransactionService:
 
             place.update(patterns)
 
-        top_20_words = place.most_common(20)
+        top_20_words = place.most_common(number_to_return)
 
         result = []
         for phrase, count in top_20_words:

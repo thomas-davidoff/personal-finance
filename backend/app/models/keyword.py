@@ -14,7 +14,7 @@ class Keyword(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "value": self.keyword,
+            "keyword": self.keyword,
             "category": {"id": self.category.id, "name": self.category.name},
             "description": self.label if self.label else "",
         }

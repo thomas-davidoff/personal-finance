@@ -5,6 +5,7 @@ from app.repositories import (
     keyword_repository,
     transaction_repository,
 )
+import re
 
 
 class CategoryService:
@@ -55,8 +56,14 @@ class CategoryService:
         warnings = []
 
         for transaction in all_transactions:
+            normalized_description = (
+                re.sub("[^a-zA-Z]+", "*", transaction.description).lower()
+            )
+            print(normalized_description)
+            parts = normalized_description.split('*')
             for keyword in all_keywords:
-                if keyword.keyword.upper() in transaction.description.upper():
+                kw_parts = keyword.keyword.split('|')
+                if all([kw_part in parts for kw_part in kw_parts]):
                     before_category = transaction.category.name
                     before_category_id = transaction.category_id
                     if before_category_id != keyword.category_id:
@@ -93,6 +100,7 @@ class CategoryService:
             "total_updated": len(updated),
             "updated": updated,
             "warnings": warnings,
+            "after_uncategorized": len(uncategorized) - len(updated)
         }
 
     def add_keyword(self, keyword, category_id, label=None):

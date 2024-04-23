@@ -74,5 +74,6 @@ def find_common_uncategorized_words():
         min_consecutive=request.args.get("min_consecutive"),
         min_word_length=request.args.get("min_word_length"),
         ignore_words=request.args.get("ignore_words"),
+        number_to_return=request.args.get('number_to_return')
     )
-    return jsonify(result, 200)
+    return jsonify(result), 200
