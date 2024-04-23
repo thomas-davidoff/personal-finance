@@ -10,6 +10,7 @@ import Transactions from "@/scenes/transactions"
 import AccountsView from "@/scenes/accounts"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import CategoriesView from "@/scenes/categories"
 
 function App() {
   const theme = useMemo(() => createTheme(themeSettings), [])
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/budget" element={<Budget />} />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/accounts" element={<AccountsView />} />
+                <Route path="/categories" element={<CategoriesView />} />
               </Routes>
             </Box>
           </LocalizationProvider>

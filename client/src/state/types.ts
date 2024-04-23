@@ -183,3 +183,68 @@ export interface UserTransactionPatch {
   description: string
   amount: number
 }
+
+export interface addCategoryRequest {
+  name: string
+  description: string
+  transaction_type: string
+  transaction_subtype: string
+}
+
+export interface updateCategoryRequest {
+  id: number
+  data: addCategoryRequest
+}
+
+export interface categorizeTransactionsResponse {
+  before_uncategorized: number
+  total_transactions: number
+  total_updated: number
+  updated: Transaction[]
+  warnings: string[]
+  after_uncategorized: number
+}
+
+export interface KeywordRequest {
+  keyword: string
+  description?: string
+  category_id: number
+}
+
+export interface KeywordResponse {
+  id: number
+  keyword: string
+  category: Category
+  description: string
+}
+
+export interface updateTransactionProps {
+  transactionId: number
+  transactionData: UserTransactionPatch
+}
+
+export interface getCommonDescriptionWordsProps {
+  minConsecutive?: number
+  minWordLength?: number
+  ignoredWords?: string
+  numberToReturn?: number
+}
+
+export interface Description {
+  account: string
+  category: string
+  description: string
+}
+
+export interface Combo {
+  count: number
+  key: Description
+}
+
+export interface getCommonDescriptionWordsResponse {
+  avg_amount: number
+  total_amount: number
+  combos: Combo[]
+  count: number
+  phrase: string
+}

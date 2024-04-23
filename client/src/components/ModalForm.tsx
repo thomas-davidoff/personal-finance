@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react"
-import { Button, Modal, Box, Typography } from "@mui/material"
+import React from "react"
+import { Button, Modal, Box, Typography, IconButton } from "@mui/material"
 
 interface ModalProps {
   title: string
@@ -7,9 +7,17 @@ interface ModalProps {
   formId: string
   children: JSX.Element
   disabled: boolean
+  iconButton?: JSX.Element
 }
 
-function ModalForm({ title, label, formId, children, disabled }: ModalProps) {
+function ModalForm({
+  title,
+  label,
+  formId,
+  children,
+  disabled,
+  iconButton,
+}: ModalProps) {
   const [open, setOpen] = React.useState(false)
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
@@ -28,9 +36,15 @@ function ModalForm({ title, label, formId, children, disabled }: ModalProps) {
 
   return (
     <Box>
-      <Button onClick={handleOpen} disabled={disabled} variant="outlined">
-        {label}
-      </Button>
+      {iconButton ? (
+        <IconButton onClick={handleOpen} disabled={disabled}>
+          {iconButton}
+        </IconButton>
+      ) : (
+        <Button onClick={handleOpen} disabled={disabled} variant="outlined">
+          {label}
+        </Button>
+      )}
       <Modal
         open={open}
         onClose={handleClose}
