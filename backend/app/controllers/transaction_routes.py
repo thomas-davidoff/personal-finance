@@ -77,3 +77,4 @@ def find_common_uncategorized_words():
         number_to_return=request.args.get('number_to_return')
     )
     return jsonify(result), 200
+

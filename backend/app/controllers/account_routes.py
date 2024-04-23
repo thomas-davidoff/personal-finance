@@ -36,9 +36,9 @@ def get_account_balances():
     return account_service.get_account_balances()
 
 
-@account_bp.route("/<int:account_id>/running_balance", methods=["GET"])
-def get_running_balance(account_id):
-    current_balance = account_service.get_running_balance(account_id=account_id)
+@account_bp.route("/running_balances", methods=["GET"])
+def get_running_balance():
+    current_balance = account_service.get_running_balance(start_date=request.args.get('start'), end_date=request.args.get('end'))
     return jsonify(current_balance), 200
 
 
