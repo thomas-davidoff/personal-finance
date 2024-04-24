@@ -5,6 +5,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 from app.exceptions import ValidationError
 import re
+from app.models.common import CATEGORY_COLOR_DEFAULT
 
 
 class TransactionService:
@@ -116,30 +117,64 @@ class TransactionService:
                 "category_name": category_repository.get_by_id(c.category_id).name,
                 "total_debits": c.total_debits,
                 "num_transactions": c.num_transactions,
+                "color": category_repository.get_by_id(c.category_id).color,
             }
             for c in transactions.all()
         ]
 
-        categories = {g.get("category_name") for g in grouped}
+        category_names = {g.get("category_name") for g in grouped}
         months = {g.get("month") for g in grouped}
+
+        # get to:
+        # {1: {'cat1': {'color':color, 'value': value}}, ...}
+        results = {}
+        for month_number in months:
+            month_group_results = {}
+            relevant_month_groups = [g for g in grouped if g["month"] == month_number]
+            for category_name in category_names:
+                relevant_category = next(
+                    (
+                        g
+                        for g in relevant_month_groups
+                        if g["category_name"] == category_name
+                    ),
+                    None,
+                )
+                if not relevant_category:
+                    month_group_results[category_name] = {
+                        "color": CATEGORY_COLOR_DEFAULT,
+                        "total_debits": 0,
+                        "num_transactions": 0,
+                    }
+                else:
+                    month_group_results[category_name] = {
+                        "color": relevant_category["color"],
+                        "total_debits": relevant_category["total_debits"],
+                        "num_transactions": relevant_category["num_transactions"],
+                    }
+            results[month_number] = month_group_results
+
+        return results
 
         def find_value_in_groups(groups, month, category_name):
             for group in groups:
                 print(group)
                 if group["month"] == month and category_name in group.values():
-                    return round(group["total_debits"], 2) * -1
-            return 0
-
-        grouped_by_months = [
-            {
-                "month": month,
-                **{
-                    category: find_value_in_groups(grouped, month, category)
-                    for category in categories
-                },
+                    return {
+                        "category": category_name,
+                        "total_debits": round(group["total_debits"], 2) * -1,
+                        "color": group["color"],
+                    }
+            return {
+                "category": category_name,
+                "color": CATEGORY_COLOR_DEFAULT,
+                "total_debits": 0,
             }
+
+        grouped_by_months = {
+            month: find_value_in_groups(grouped, month, "Uncategorized")
             for month in months
-        ]
+        }
         return grouped_by_months
 
     def find_most_common_descriptions(

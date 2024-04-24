@@ -4,7 +4,6 @@ import {
   Transaction,
   CategoryReponse,
   UserTransactionPatch,
-  Category,
   updateTransactionProps,
   getCommonDescriptionWordsProps,
   getCommonDescriptionWordsResponse,
@@ -126,7 +125,7 @@ export const api = createApi({
       }),
       invalidatesTags: ["AllKeywords"],
     }),
-    createCategory: build.mutation<Category, addCategoryRequest>({
+    createCategory: build.mutation<CategoryReponse, addCategoryRequest>({
       query: (categoryData) => ({
         url: "categories/",
         method: "POST",
@@ -141,7 +140,7 @@ export const api = createApi({
       }),
       invalidatesTags: ["AllCategories"],
     }),
-    updateCategory: build.mutation<Category, updateCategoryRequest>({
+    updateCategory: build.mutation<CategoryReponse, updateCategoryRequest>({
       query: ({ id, data }) => ({
         url: `categories/${id}`,
         method: "PATCH",
@@ -149,7 +148,7 @@ export const api = createApi({
       }),
       invalidatesTags: ["AllCategories"],
     }),
-    getCategory: build.query<Category, number>({
+    getCategory: build.query<CategoryReponse, number>({
       query: (categoryId) => ({
         url: `categories/${categoryId}`,
         providesTags: ["SingleCategory"],
@@ -190,13 +189,18 @@ interface StartEndDateParams {
   endDate?: string
 }
 
-interface AggregatedTransactionsByCategoryResponse {
-  category_id: number
-  category_name: string
-  num_transactions: number
-  total_credits: number
+export interface AggregatedTransactionsByCategoryResponse {
+  [key: string]: AggregatedCategoriesResponse
+}
+
+interface AggregatedCategoriesResponse {
+  [key: string]: AggregatedCategory
+}
+
+interface AggregatedCategory {
+  color: string
   total_debits: number
-  month: number
+  num_transactions: number
 }
 
 export const {

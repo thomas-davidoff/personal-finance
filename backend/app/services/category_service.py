@@ -6,6 +6,8 @@ from app.repositories import (
     transaction_repository,
 )
 import re
+from app.models.common import ColorEnum
+from app.exceptions import ValidationError
 
 
 class CategoryService:
@@ -56,13 +58,13 @@ class CategoryService:
         warnings = []
 
         for transaction in all_transactions:
-            normalized_description = (
-                re.sub("[^a-zA-Z]+", "*", transaction.description).lower()
-            )
+            normalized_description = re.sub(
+                "[^a-zA-Z]+", "*", transaction.description
+            ).lower()
             print(normalized_description)
-            parts = normalized_description.split('*')
+            parts = normalized_description.split("*")
             for keyword in all_keywords:
-                kw_parts = keyword.keyword.split('|')
+                kw_parts = keyword.keyword.split("|")
                 if all([kw_part in parts for kw_part in kw_parts]):
                     before_category = transaction.category.name
                     before_category_id = transaction.category_id
@@ -100,7 +102,7 @@ class CategoryService:
             "total_updated": len(updated),
             "updated": updated,
             "warnings": warnings,
-            "after_uncategorized": len(uncategorized) - len(updated)
+            "after_uncategorized": len(uncategorized) - len(updated),
         }
 
     def add_keyword(self, keyword, category_id, label=None):
@@ -122,11 +124,27 @@ class CategoryService:
         return deleted_transaction_message
 
     def add_category(self, data):
-        category = category_repository.create_category(data)
+        category = category_repository.create_category(
+            self._validate_new_category_data(data)
+        )
         return category.to_dict()
 
     def update_category(self, category_id, data):
         updated_category = category_repository.update_by_id(
-            model_id=category_id, new_data=data
+            model_id=category_id, new_data=self._validate_new_category_data(data)
         )
         return updated_category.to_dict()
+
+    def _validate_new_category_data(self, data):
+        return {**data, "color": self._get_category_color(data.get("color"))}
+
+    def _get_category_color(self, color_string):
+        if color_string is None:
+            return color_string
+        try:
+            return ColorEnum[color_string].value
+        except KeyError:
+            raise ValidationError(
+                f'color: {color_string} does not exist. It must be one of: {", ".join(list(ColorEnum.__members__))}',
+                400,
+            )
