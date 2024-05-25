@@ -1,4 +1,4 @@
-import { useGetCategoriesQuery, useDeleteCategoryMutation } from "@/state/api"
+import { useGetCategoriesQuery } from "@/state/api"
 import { Box } from "@mui/material"
 import MostCommonWords from "@/scenes/categories/mostCommonWords"
 import AllKeywordsTable from "@/scenes/categories/AllKeywords"
@@ -11,13 +11,8 @@ import {
   GridRowModesModel,
 } from "@mui/x-data-grid"
 import StyledDataGrid from "@/components/StyledDataGrid"
-import UpdateCategoryForm2 from "@/scenes/categories/UpdateCat2"
 import CategoryColorPill from "@/components/CategoryColorPill"
-
-import IconButton from "@mui/material/IconButton"
-import Menu from "@mui/material/Menu"
-import MenuItem from "@mui/material/MenuItem"
-import MoreVertIcon from "@mui/icons-material/MoreVert"
+import RowEdit from "@/components/RowEdit"
 
 const CategoriesView = () => {
   const { data: categories } = useGetCategoriesQuery()
@@ -50,96 +45,9 @@ const CategoriesView = () => {
       field: "edit",
       headerName: "Edit",
       flex: 1,
-      renderCell: (params) => {
-        const rowId = params.row.id
-        const [anchorEl, setAnchorEl] = useState<null | EventTarget>(null)
-        const open = Boolean(anchorEl)
-
-        useEffect(() => {
-          if (open) {
-            setSelectedRowIds([rowId])
-          }
-        }, [open])
-
-        const [modalOpen, setModalOpen] = useState(false)
-
-        const handleClick = (event: Event) => {
-          event.stopPropagation()
-          setAnchorEl(event.currentTarget)
-        }
-
-        const handleClose = () => {
-          setAnchorEl(null)
-        }
-
-        const handleOpenModal = () => {
-          handleClose() // Close the menu
-          setTimeout(() => {
-            // Delay the modal opening to ensure menu closes smoothly
-            setModalOpen(true)
-          }, 100)
-        }
-
-        const [deleteCategory] = useDeleteCategoryMutation()
-
-        const handleDeleteCategory = async () => {
-          handleClose()
-          try {
-            const response = await deleteCategory(
-              Number(selectedRowIds[0])
-            ).unwrap()
-            alert(response.message)
-          } catch (error: unknown) {
-            if (typeof error === "string") {
-              error.toUpperCase()
-            } else if (error instanceof Error || error instanceof Object) {
-              if ("message" in error) {
-                alert(`Category could not be deleted: ${error.message}`)
-              }
-            } else {
-              alert("There was a problem deleting the category.")
-              console.error(error)
-            }
-          }
-        }
-
-        return (
-          <div>
-            <IconButton
-              aria-label="more"
-              aria-controls="long-menu"
-              aria-haspopup="true"
-              onClick={handleClick}
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              id="long-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-            >
-              <MenuItem
-                onClick={handleOpenModal}
-                disabled={isNaN(Number(selectedRowIds[0]))}
-              >
-                Update
-              </MenuItem>
-              <MenuItem
-                disabled={isNaN(Number(selectedRowIds[0]))}
-                onClick={handleDeleteCategory}
-              >
-                Delete
-              </MenuItem>
-            </Menu>
-            <UpdateCategoryForm2
-              open={modalOpen}
-              setOpen={setModalOpen}
-              categoryId={selectedRowIds}
-            />
-          </div>
-        )
-      },
+      renderCell: (params) => (
+        <RowEdit rowId={params.row.id} setSelectedRowIds={setSelectedRowIds} />
+      ),
       sortable: false,
     },
   ]
@@ -159,6 +67,7 @@ const CategoriesView = () => {
   }, [categories])
   return (
     <Box display="grid" gap="1.5rem">
+      {selectedRowIds}
       <Box>
         <AddCategoryForm />
         {categories && (

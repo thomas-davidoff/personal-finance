@@ -12,7 +12,6 @@ import {
   TextField,
   FormGroup,
 } from "@mui/material"
-import { GridRowId } from "@mui/x-data-grid"
 import ModalForm2 from "@/components/ModalForm2"
 import {
   transactionTypes,
@@ -21,7 +20,7 @@ import {
 import CategoryColorPill from "@/components/CategoryColorPill"
 
 interface Props {
-  categoryId: GridRowId[]
+  categoryId: number
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -31,7 +30,7 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
   const [transactionType, setTransactionType] = useState("")
   const [color, setColor] = useState("grey")
   const [transactionSubtype, setTransactionSubtype] = useState("")
-  const [cId, setcId] = useState(Number(categoryId[0])) // Initial set from props
+  const [cId, setcId] = useState(Number(categoryId)) // Initial set from props
   const { data: category } = useGetCategoryQuery(cId, {
     skip: isNaN(cId),
   })
@@ -41,7 +40,7 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
 
   // Effect to update cId when categoryId changes
   useEffect(() => {
-    setcId(Number(categoryId[0]))
+    setcId(Number(categoryId))
   }, [categoryId])
 
   // Separate effect to log and update other states when cId changes
