@@ -49,14 +49,7 @@ def delete_category(category_id):
 
 @category_bp.route("/", methods=["POST"])
 def create_category():
-    new_category = category_service.add_category(
-        {
-            "description": request.json.get("description"),
-            "name": request.json.get("name"),
-            "transaction_subtype": request.json.get("transaction_subtype"),
-            "transaction_type": request.json.get("transaction_type"),
-        }
-    )
+    new_category = category_service.add_category(request.json)
     return jsonify(new_category), 201
 
 

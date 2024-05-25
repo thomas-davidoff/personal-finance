@@ -149,31 +149,27 @@ export interface Account {
   starting_balance?: number
 }
 
-export interface Category {
-  id: number
-  name?: string
-  description?: string
-  num_transactions?: number
-  transaction_type?: string
-  transaction_subtype?: string
-}
-
-export interface CategoryReponse {
-  id: number
-  name: string
+export interface CategoryReponse extends CategoryCompactResponse {
   description: string
   num_transactions: number
   transaction_type: string
   transaction_subtype: string
+  color: string
+}
+
+export interface CategoryCompactResponse {
+  id: number
+  name: string
+  color: string
 }
 
 export interface Transaction {
   account: Account
   amount: number
-  category?: Category
+  category: CategoryCompactResponse
   date: string
   description: string
-  id?: number
+  id: number
 }
 
 export interface UserTransactionPatch {
@@ -214,7 +210,7 @@ export interface KeywordRequest {
 export interface KeywordResponse {
   id: number
   keyword: string
-  category: Category
+  category: CategoryCompactResponse
   description: string
 }
 

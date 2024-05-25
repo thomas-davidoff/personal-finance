@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react"
-import { useUpdateCategoryMutation, useGetCategoryQuery } from "@/state/api"
+import {
+  useUpdateCategoryMutation,
+  useGetCategoryQuery,
+  useGetColorSchemeQuery,
+} from "@/state/api"
 import {
   FormControl,
   Select,
@@ -9,37 +13,48 @@ import {
   FormGroup,
 } from "@mui/material"
 import { GridRowId } from "@mui/x-data-grid"
-import ModalForm from "@/components/ModalForm"
+import ModalForm2 from "@/components/ModalForm2"
 import {
   transactionTypes,
   transactionSubtypes,
 } from "@/scenes/categories/constants"
+import CategoryColorPill from "@/components/CategoryColorPill"
 
 interface Props {
   categoryId: GridRowId[]
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function UpdateCategoryForm({ categoryId }: Props) {
+function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
   const [name, setName] = useState("")
   const [transactionType, setTransactionType] = useState("")
+  const [color, setColor] = useState("grey")
   const [transactionSubtype, setTransactionSubtype] = useState("")
-  const cId = Number(categoryId[0])
+  const [cId, setcId] = useState(Number(categoryId[0])) // Initial set from props
   const { data: category } = useGetCategoryQuery(cId, {
     skip: isNaN(cId),
   })
-
+  const { data: colors } = useGetColorSchemeQuery()
   const [updateCategory] = useUpdateCategoryMutation()
-
   const [description, setDescription] = useState("")
 
+  // Effect to update cId when categoryId changes
   useEffect(() => {
+    setcId(Number(categoryId[0]))
+  }, [categoryId])
+
+  // Separate effect to log and update other states when cId changes
+  useEffect(() => {
+    console.log(`new selection: ${cId}`) // Correct place to log the updated cId
     if (category) {
       setDescription(category.description || "")
+      setColor(category.color || "")
       setName(category.name || "")
       setTransactionType(category.transaction_type || "")
       setTransactionSubtype(category.transaction_subtype || "")
     }
-  }, [categoryId])
+  }, [cId, category]) // Notice cId is a dependency now
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -50,6 +65,7 @@ function UpdateCategoryForm({ categoryId }: Props) {
         description,
         transaction_type: transactionType,
         transaction_subtype: transactionSubtype,
+        color,
       },
     }
 
@@ -71,14 +87,16 @@ function UpdateCategoryForm({ categoryId }: Props) {
   const thisFormId = "update-category-form"
 
   return (
-    <ModalForm
+    <ModalForm2
       formId={thisFormId}
       label="Update Category"
       title="Update a category"
       disabled={isNaN(cId)}
+      open={open}
+      setOpen={setOpen}
     >
       <form onSubmit={handleSubmit} id={thisFormId}>
-        <FormGroup>
+        <FormGroup sx={{ gap: "20px" }}>
           <FormControl fullWidth>
             <TextField
               id="category-name-field"
@@ -102,6 +120,26 @@ function UpdateCategoryForm({ categoryId }: Props) {
               {transactionTypes.map((type) => (
                 <MenuItem key={type} value={type}>
                   {type}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel id="color-select-label">Color</InputLabel>
+            <Select
+              id="color-select-field"
+              labelId="color-select-label"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+            >
+              {colors?.map((c) => (
+                <MenuItem
+                  key={c.key}
+                  value={c.key}
+                  sx={{ color: c.foreground }}
+                >
+                  <CategoryColorPill label={c.label} colorKey={c.key} />
                 </MenuItem>
               ))}
             </Select>
@@ -136,8 +174,8 @@ function UpdateCategoryForm({ categoryId }: Props) {
           </FormControl>
         </FormGroup>
       </form>
-    </ModalForm>
+    </ModalForm2>
   )
 }
 
-export default UpdateCategoryForm
+export default UpdateCategoryForm2

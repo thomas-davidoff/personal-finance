@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, jsonify
 import pandas as pd
 import json
 from app.services import transaction_service
 from datetime import datetime
+from app.models.common import ColorEnum
 
 main_bp = Blueprint("main_bp", __name__)
 
@@ -55,3 +56,7 @@ def import_bofa():
         date = datetime.utcfromtimestamp(transaction["date"] / 1000)
         kwargs = {**transaction, "date": date}
         transaction_service.add_transaction(**kwargs)
+
+@main_bp.route('/color-scheme')
+def get_color_scheme():
+    return jsonify([ColorEnum[m].value for m in list(ColorEnum.__members__)]), 200
