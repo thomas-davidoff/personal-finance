@@ -136,13 +136,16 @@ class CategoryService:
         return updated_category.to_dict()
 
     def _validate_new_category_data(self, data):
-        return {**data, "color": self._get_category_color(data.get("color"))}
+        return {
+            **data,
+            "color": self._get_category_color(data.get("color")),
+        }
 
     def _get_category_color(self, color_string):
         if color_string is None:
             return color_string
         try:
-            return ColorEnum[color_string].value
+            return ColorEnum[color_string].value['key']
         except KeyError:
             raise ValidationError(
                 f'color: {color_string} does not exist. It must be one of: {", ".join(list(ColorEnum.__members__))}',

@@ -160,6 +160,7 @@ export interface CategoryReponse extends CategoryCompactResponse {
 export interface CategoryCompactResponse {
   id: number
   name: string
+  color: string
 }
 
 export interface Transaction {

@@ -27,6 +27,7 @@ export const api = createApi({
     "CommonDescriptionWords",
     "SingleCategory",
     "AggregatedTransactionsByCategory",
+    "ColorScheme",
   ],
   endpoints: (build) => ({
     getAccounts: build.query<Array<Account>, void>({
@@ -171,6 +172,10 @@ export const api = createApi({
         url: `accounts/running_balances?start=${startDate}&end=${endDate}`,
       }),
     }),
+    getColorScheme: build.query<Color[], void>({
+      query: () => "color-scheme",
+      providesTags: ["ColorScheme"],
+    }),
   }),
 })
 
@@ -203,6 +208,13 @@ interface AggregatedCategory {
   num_transactions: number
 }
 
+interface Color {
+  background: string
+  foreground: string
+  key: string
+  label: string
+}
+
 export const {
   useGetAccountsQuery,
   useGetTransactionsQuery,
@@ -223,4 +235,5 @@ export const {
   useGetCategoryQuery,
   useGetAggregatedTransactionsByCategoryQuery,
   useGetAccountRunningBalanceQuery,
+  useGetColorSchemeQuery,
 } = api

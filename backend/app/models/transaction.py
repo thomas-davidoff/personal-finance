@@ -36,7 +36,7 @@ class Transaction(db.Model):
                 {
                     k: v
                     for k, v in self.category.to_dict().items()
-                    if k in ["id", "name"]
+                    if k in ["id", "name", "color"]
                 }
                 if self.category
                 else None
