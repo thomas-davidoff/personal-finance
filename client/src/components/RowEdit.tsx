@@ -1,6 +1,4 @@
-import { useDeleteCategoryMutation } from "@/state/api"
 import { useState, useEffect } from "react"
-import UpdateCategoryForm2 from "@/scenes/categories/UpdateCat2"
 import IconButton from "@mui/material/IconButton"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
@@ -10,9 +8,20 @@ import { GridRowId } from "@mui/x-data-grid"
 interface RowEditProps {
   rowId: number
   setSelectedRowIds: React.Dispatch<React.SetStateAction<GridRowId[]>>
+  UpdateModal: React.FunctionComponent<{
+    open: boolean
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    id: number
+  }>
+  handleDelete: (rowId: number) => Promise<void>
 }
 
-export default function RowEdit({ rowId, setSelectedRowIds }: RowEditProps) {
+export default function RowEdit({
+  rowId,
+  setSelectedRowIds,
+  UpdateModal,
+  handleDelete,
+}: RowEditProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
@@ -34,32 +43,15 @@ export default function RowEdit({ rowId, setSelectedRowIds }: RowEditProps) {
   }
 
   const handleOpenModal = () => {
-    handleClose() // Close the menu
+    handleClose()
     setTimeout(() => {
-      // Delay the modal opening to ensure menu closes smoothly
       setModalOpen(true)
     }, 100)
   }
 
-  const [deleteCategory] = useDeleteCategoryMutation()
-
-  const handleDeleteCategory = async () => {
+  const handleDeleteRow = async () => {
     handleClose()
-    try {
-      const response = await deleteCategory(Number(rowId)).unwrap()
-      alert(response.message)
-    } catch (error: unknown) {
-      if (typeof error === "string") {
-        error.toUpperCase()
-      } else if (error instanceof Error || error instanceof Object) {
-        if ("message" in error) {
-          alert(`Category could not be deleted: ${error.message}`)
-        }
-      } else {
-        alert("There was a problem deleting the category.")
-        console.error(error)
-      }
-    }
+    await handleDelete(rowId)
   }
 
   return (
@@ -79,13 +71,9 @@ export default function RowEdit({ rowId, setSelectedRowIds }: RowEditProps) {
         onClose={handleClose}
       >
         <MenuItem onClick={handleOpenModal}>Update</MenuItem>
-        <MenuItem onClick={handleDeleteCategory}>Delete</MenuItem>
+        <MenuItem onClick={handleDeleteRow}>Delete</MenuItem>
       </Menu>
-      <UpdateCategoryForm2
-        open={modalOpen}
-        setOpen={setModalOpen}
-        categoryId={rowId}
-      />
+      <UpdateModal open={modalOpen} setOpen={setModalOpen} id={rowId} />
     </div>
   )
 }
