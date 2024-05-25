@@ -14,7 +14,7 @@ import StyledDataGrid from "@/components/StyledDataGrid"
 import CategoryColorPill from "@/components/CategoryColorPill"
 import RowEdit from "@/components/RowEdit"
 import UpdateCategoryForm2 from "@/scenes/categories/UpdateCat2"
-import { useHandleDeleteCategory } from "@/hooks/useHandleDeleteCategory"
+import { useHandleDeleteCategory } from "@/hooks/useHandleDelete"
 
 const CategoriesView = () => {
   const { data: categories } = useGetCategoriesQuery()
