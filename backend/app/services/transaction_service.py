@@ -5,7 +5,8 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 from app.exceptions import ValidationError
 import re
-from app.models.common import CATEGORY_COLOR_DEFAULT
+from app.models.common import CATEGORY_COLOR_DEFAULT, MONTHS
+from collections import OrderedDict
 
 
 class TransactionService:
@@ -127,7 +128,7 @@ class TransactionService:
 
         # get to:
         # {1: {'cat1': {'color':color, 'value': value}}, ...}
-        results = {}
+        results = OrderedDict()
         for month_number in months:
             month_group_results = {}
             relevant_month_groups = [g for g in grouped if g["month"] == month_number]
@@ -155,27 +156,6 @@ class TransactionService:
             results[month_number] = month_group_results
 
         return results
-
-        def find_value_in_groups(groups, month, category_name):
-            for group in groups:
-                print(group)
-                if group["month"] == month and category_name in group.values():
-                    return {
-                        "category": category_name,
-                        "total_debits": round(group["total_debits"], 2) * -1,
-                        "color": group["color"],
-                    }
-            return {
-                "category": category_name,
-                "color": CATEGORY_COLOR_DEFAULT,
-                "total_debits": 0,
-            }
-
-        grouped_by_months = {
-            month: find_value_in_groups(grouped, month, "Uncategorized")
-            for month in months
-        }
-        return grouped_by_months
 
     def find_most_common_descriptions(
         self, min_consecutive, min_word_length, ignore_words, number_to_return
