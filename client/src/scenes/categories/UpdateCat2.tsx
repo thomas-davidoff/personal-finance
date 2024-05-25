@@ -20,17 +20,17 @@ import {
 import CategoryColorPill from "@/components/CategoryColorPill"
 
 interface Props {
-  categoryId: number
+  id: number
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
+function UpdateCategoryForm2({ id, open, setOpen }: Props) {
   const [name, setName] = useState("")
   const [transactionType, setTransactionType] = useState("")
   const [color, setColor] = useState("grey")
   const [transactionSubtype, setTransactionSubtype] = useState("")
-  const [cId, setcId] = useState(Number(categoryId)) // Initial set from props
+  const [cId, setcId] = useState(Number(id)) // Initial set from props
   const { data: category } = useGetCategoryQuery(cId, {
     skip: isNaN(cId),
   })
@@ -40,8 +40,8 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
 
   // Effect to update cId when categoryId changes
   useEffect(() => {
-    setcId(Number(categoryId))
-  }, [categoryId])
+    setcId(Number(id))
+  }, [id])
 
   // Separate effect to log and update other states when cId changes
   useEffect(() => {

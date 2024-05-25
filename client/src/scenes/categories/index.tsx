@@ -13,12 +13,16 @@ import {
 import StyledDataGrid from "@/components/StyledDataGrid"
 import CategoryColorPill from "@/components/CategoryColorPill"
 import RowEdit from "@/components/RowEdit"
+import UpdateCategoryForm2 from "@/scenes/categories/UpdateCat2"
+import { useHandleDeleteCategory } from "@/hooks/useHandleDeleteCategory"
 
 const CategoriesView = () => {
   const { data: categories } = useGetCategoriesQuery()
   const [selectedRowIds, setSelectedRowIds] = useState<Array<GridRowId>>([])
   const [rows, setRows] = useState<GridRowsProp>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
+
+  const handleDeleteCategory = useHandleDeleteCategory()
 
   const columns: GridColDef[] = [
     {
@@ -46,7 +50,12 @@ const CategoriesView = () => {
       headerName: "Edit",
       flex: 1,
       renderCell: (params) => (
-        <RowEdit rowId={params.row.id} setSelectedRowIds={setSelectedRowIds} />
+        <RowEdit
+          rowId={params.row.id}
+          setSelectedRowIds={setSelectedRowIds}
+          UpdateModal={UpdateCategoryForm2}
+          handleDelete={handleDeleteCategory}
+        />
       ),
       sortable: false,
     },
