@@ -15,17 +15,21 @@ import {
 } from "@mui/material"
 import { DateField } from "@mui/x-date-pickers/DateField"
 import dayjs, { Dayjs } from "dayjs"
-import { GridRowId } from "@mui/x-data-grid"
-import ModalForm from "@/components/ModalForm"
+
+import ModalForm2 from "@/components/ModalForm2"
 
 interface Props {
-  transactionId: GridRowId[]
+  id: number
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function UpdateTransactionForm({ transactionId }: Props) {
+function UpdateTransactionForm({ id, open, setOpen }: Props) {
+  const thisFormId = "update-transaction-form"
+
   const { data: accounts } = useGetAccountsQuery()
   const { data: categories } = useGetCategoriesQuery()
-  const tId = Number(transactionId[0])
+  const tId = Number(id)
   const { data: transaction } = useGetTransactionQuery(tId, {
     skip: isNaN(tId),
   })
@@ -68,14 +72,14 @@ function UpdateTransactionForm({ transactionId }: Props) {
     }
   }
 
-  const thisFormId = "POOOOOOOOO"
-
   return (
-    <ModalForm
+    <ModalForm2
       formId={thisFormId}
       label="Update Transaction"
       title="Update a transaction"
       disabled={isNaN(tId)}
+      open={open}
+      setOpen={setOpen}
     >
       <form onSubmit={handleSubmit} id={thisFormId}>
         <FormGroup>
@@ -141,7 +145,7 @@ function UpdateTransactionForm({ transactionId }: Props) {
           </FormControl>
         </FormGroup>
       </form>
-    </ModalForm>
+    </ModalForm2>
   )
 }
 

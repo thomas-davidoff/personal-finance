@@ -6,7 +6,10 @@ import {
   FetchBaseQueryError,
   FetchBaseQueryMeta,
 } from "@reduxjs/toolkit/query/react"
-import { useDeleteCategoryMutation } from "@/state/api"
+import {
+  useDeleteCategoryMutation,
+  useDeleteTransactionMutation,
+} from "@/state/api"
 
 type GenericMutationHook<
   MutationResponse,
@@ -78,5 +81,18 @@ export function useHandleDeleteCategory() {
 
   return useHandleDelete({
     deleteMutation: deleteCategoryMutation,
+  })
+}
+
+export function useHandleDeleteTransaction() {
+  const deleteTransactionMutation =
+    useDeleteTransactionMutation() as GenericMutationHook<
+      { message: string },
+      number,
+      "AllCategories"
+    >
+
+  return useHandleDelete({
+    deleteMutation: deleteTransactionMutation,
   })
 }

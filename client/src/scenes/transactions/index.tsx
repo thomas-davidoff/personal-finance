@@ -15,6 +15,8 @@ import DeleteMultipleTransactions from "@/scenes/transactions/DeleteTransactionB
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import CategoryColorPill from "@/components/CategoryColorPill"
+import RowEdit from "@/components/RowEdit"
+import { useHandleDeleteTransaction } from "@/hooks/useHandleDelete"
 
 dayjs.extend(utc)
 
@@ -22,6 +24,8 @@ const Transactions = () => {
   const [selectedRowIds, setSelectedRowIds] = useState<Array<GridRowId>>([])
   const [rows, setRows] = useState<GridRowsProp>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
+
+  const handleDeleteTransaction = useHandleDeleteTransaction()
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 75 },
@@ -54,6 +58,20 @@ const Transactions = () => {
         )
       },
     },
+    {
+      field: "edit",
+      headerName: "Edit",
+      flex: 1,
+      renderCell: (params) => (
+        <RowEdit
+          rowId={params.row.id}
+          setSelectedRowIds={setSelectedRowIds}
+          UpdateModal={UpdateTransactionForm}
+          handleDelete={handleDeleteTransaction}
+        />
+      ),
+      sortable: false,
+    },
   ]
 
   const { data: transactionsData } = useGetTransactionsQuery({
@@ -80,7 +98,6 @@ const Transactions = () => {
       <DeleteMultipleTransactions transactionId={selectedRowIds} />
       <DashboardBox>
         <TransactionForm />
-        <UpdateTransactionForm transactionId={selectedRowIds} />
       </DashboardBox>
       <DashboardBox display={"flex"} minHeight={250}>
         <div style={{ flexGrow: 1 }}>
