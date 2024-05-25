@@ -30,7 +30,6 @@ function AddCategoryForm() {
       transaction_subtype: transactionSubtype,
     }
 
-    console.log(categoryData)
     try {
       const response = await createCategory(categoryData).unwrap()
       alert(`Category successfully created with id ${response.id}.`)

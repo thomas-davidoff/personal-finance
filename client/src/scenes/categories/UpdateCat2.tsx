@@ -45,7 +45,7 @@ function UpdateCategoryForm2({ id, open, setOpen }: Props) {
 
   // Separate effect to log and update other states when cId changes
   useEffect(() => {
-    console.log(`new selection: ${cId}`) // Correct place to log the updated cId
+    // Correct place to log the updated cId
     if (category) {
       setDescription(category.description || "")
       setColor(category.color || "")

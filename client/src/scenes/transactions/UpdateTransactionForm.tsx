@@ -62,10 +62,8 @@ function UpdateTransactionForm({ transactionId }: Props) {
         transactionId: tId,
         transactionData,
       }).unwrap()
-      console.log(response)
       alert(`transaction successfully created with id ${response.id}.`)
     } catch (error: unknown) {
-      console.log(error)
       alert(`Transaction could not be created: ${error.data.message}`)
     }
   }

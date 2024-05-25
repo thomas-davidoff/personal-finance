@@ -23,8 +23,6 @@ const Transactions = () => {
   const [rows, setRows] = useState<GridRowsProp>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
 
-  // console.log(selectedRowIds)
-
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 75 },
     {
@@ -48,7 +46,6 @@ const Transactions = () => {
       headerName: "Category",
       width: 150,
       renderCell: (params) => {
-        console.log(params.value)
         return (
           <CategoryColorPill
             label={params.value.name}
