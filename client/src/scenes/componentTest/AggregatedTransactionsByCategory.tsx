@@ -8,8 +8,12 @@ import {
   Tooltip,
   Legend,
 } from "recharts"
-import { useGetAggregatedTransactionsByCategoryQuery } from "@/state/api"
+import {
+  useGetAggregatedTransactionsByCategoryQuery,
+  useGetColorSchemeQuery,
+} from "@/state/api"
 import { apiColors } from "@/theme"
+import { getColorObjectByKey } from "@/components/funx"
 
 interface Props {
   startDate: string
@@ -25,6 +29,8 @@ export default function AggregatedTransactionsByCategory({
     endDate,
   })
 
+  const { data: colorMap } = useGetColorSchemeQuery()
+
   const colorsMap = {}
 
   const results =
@@ -33,7 +39,7 @@ export default function AggregatedTransactionsByCategory({
       const categoriesData = data[month]
       const result = { month }
       Object.keys(categoriesData).forEach((categoryName) => {
-        result[categoryName] = categoriesData[categoryName].total_debits
+        result[categoryName] = categoriesData[categoryName].total_debits * -1
         colorsMap[categoryName] = categoriesData[categoryName].color
       })
       return result
@@ -65,7 +71,10 @@ export default function AggregatedTransactionsByCategory({
                     key={category}
                     dataKey={category}
                     name={category}
-                    fill={color} // Using mapped colors
+                    fill={
+                      getColorObjectByKey(colorMap, colorsMap[category])
+                        .background
+                    } // Using mapped colors
                     stackId="a"
                   />
                 )

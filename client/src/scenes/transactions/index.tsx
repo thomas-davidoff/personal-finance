@@ -14,6 +14,7 @@ import DashboardBox from "@/components/DashboardBox"
 import DeleteMultipleTransactions from "@/scenes/transactions/DeleteTransactionButton"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
+import CategoryColorPill from "@/components/CategoryColorPill"
 
 dayjs.extend(utc)
 
@@ -46,6 +47,15 @@ const Transactions = () => {
       field: "category",
       headerName: "Category",
       width: 150,
+      renderCell: (params) => {
+        console.log(params.value)
+        return (
+          <CategoryColorPill
+            label={params.value.name}
+            colorKey={params.value.color}
+          />
+        )
+      },
     },
   ]
 
@@ -62,7 +72,7 @@ const Transactions = () => {
         date: new Date(transaction.date),
         account: transaction.account?.name,
         amount: transaction.amount,
-        category: transaction.category?.name,
+        category: transaction.category,
       }))
       setRows(mappedRows)
     }
