@@ -88,12 +88,6 @@ const CategoriesView = () => {
             onRowSelectionModelChange={(newSelectionModel) => {
               setSelectedRowIds(newSelectionModel)
             }}
-            sx={{
-              height: "100%",
-              "&.MuiDataGrid-root .MuiDataGrid-cell:focus-within": {
-                outline: "none !important",
-              },
-            }}
           />
         )}
       </Box>
