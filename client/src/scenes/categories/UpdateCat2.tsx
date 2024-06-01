@@ -32,7 +32,7 @@ function UpdateCategoryForm2({ id, open, setOpen }: Props) {
   const [transactionSubtype, setTransactionSubtype] = useState("")
   const [cId, setcId] = useState(Number(id)) // Initial set from props
   const { data: category } = useGetCategoryQuery(cId, {
-    skip: isNaN(cId),
+    skip: isNaN(cId) || !open,
   })
   const { data: colors } = useGetColorSchemeQuery()
   const [updateCategory] = useUpdateCategoryMutation()
@@ -46,14 +46,14 @@ function UpdateCategoryForm2({ id, open, setOpen }: Props) {
   // Separate effect to log and update other states when cId changes
   useEffect(() => {
     // Correct place to log the updated cId
-    if (category) {
+    if (category && open) {
       setDescription(category.description || "")
       setColor(category.color || "")
       setName(category.name || "")
       setTransactionType(category.transaction_type || "")
       setTransactionSubtype(category.transaction_subtype || "")
     }
-  }, [cId, category]) // Notice cId is a dependency now
+  }, [open, cId, category]) // Notice cId is a dependency now
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

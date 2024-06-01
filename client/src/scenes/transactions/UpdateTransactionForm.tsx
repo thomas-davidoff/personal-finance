@@ -31,7 +31,7 @@ function UpdateTransactionForm({ id, open, setOpen }: Props) {
   const { data: categories } = useGetCategoriesQuery()
   const tId = Number(id)
   const { data: transaction } = useGetTransactionQuery(tId, {
-    skip: isNaN(tId),
+    skip: isNaN(tId) || !open,
   })
 
   const [updateTransaction] = useUpdateTransactionMutation()
@@ -43,14 +43,14 @@ function UpdateTransactionForm({ id, open, setOpen }: Props) {
   const [categoryId, setCategoryId] = useState(transaction?.category?.id || 0)
 
   useEffect(() => {
-    if (transaction) {
+    if (transaction && open) {
       setDescription(transaction.description || "")
       setAmount(transaction.amount || 0)
       setAccountId(transaction.account?.id)
       setDate(dayjs(transaction.date || dayjs()))
       setCategoryId(transaction.category?.id || 0)
     }
-  }, [transaction])
+  }, [open, transaction])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
