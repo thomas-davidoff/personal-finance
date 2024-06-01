@@ -7,7 +7,7 @@ import { GridRowId } from "@mui/x-data-grid"
 
 interface RowEditProps {
   rowId: number
-  setSelectedRowIds: React.Dispatch<React.SetStateAction<GridRowId[]>>
+  setSelectedRowIds?: React.Dispatch<React.SetStateAction<GridRowId[]>>
   UpdateModal: React.FunctionComponent<{
     open: boolean
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -26,7 +26,7 @@ export default function RowEdit({
   const open = Boolean(anchorEl)
 
   useEffect(() => {
-    if (open) {
+    if (open && setSelectedRowIds) {
       setSelectedRowIds([rowId])
     }
   }, [open])
