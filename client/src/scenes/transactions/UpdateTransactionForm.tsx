@@ -15,6 +15,7 @@ import {
 } from "@mui/material"
 import { DateField } from "@mui/x-date-pickers/DateField"
 import dayjs, { Dayjs } from "dayjs"
+import CategoryColorPill from "@/components/CategoryColorPill"
 
 import ModalForm2 from "@/components/ModalForm2"
 
@@ -29,41 +30,44 @@ function UpdateTransactionForm({ id, open, setOpen }: Props) {
 
   const { data: accounts } = useGetAccountsQuery()
   const { data: categories } = useGetCategoriesQuery()
-  const tId = Number(id)
-  const { data: transaction } = useGetTransactionQuery(tId, {
-    skip: isNaN(tId) || !open,
+  const { data: transaction } = useGetTransactionQuery(id, {
+    skip: !open,
   })
 
   const [updateTransaction] = useUpdateTransactionMutation()
 
-  const [description, setDescription] = useState(transaction?.description || "")
-  const [amount, setAmount] = useState(transaction?.amount || 0)
-  const [accountId, setAccountId] = useState(transaction?.account.id || 0)
-  const [date, setDate] = useState<Dayjs>(dayjs())
-  const [categoryId, setCategoryId] = useState(transaction?.category?.id || 0)
+  const [formData, setFormData] = useState({
+    description: "",
+    amount: 0,
+    accountId: 0,
+    date: dayjs(),
+    categoryId: 0,
+  })
 
   useEffect(() => {
     if (transaction && open) {
-      setDescription(transaction.description || "")
-      setAmount(transaction.amount || 0)
-      setAccountId(transaction.account?.id)
-      setDate(dayjs(transaction.date || dayjs()))
-      setCategoryId(transaction.category?.id || 0)
+      setFormData({
+        description: transaction.description || "",
+        amount: transaction.amount || 0,
+        accountId: transaction.account?.id,
+        date: dayjs(transaction.date) || dayjs(),
+        categoryId: transaction.category?.id || 0,
+      })
     }
   }, [open, transaction])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const transactionData = {
-      description,
-      amount: Number(amount),
-      date: date.format("YYYY-MM-DD"),
-      category_id: categoryId,
-      account_id: accountId,
+      description: formData.description,
+      amount: Number(formData.amount),
+      date: formData.date.format("YYYY-MM-DD"),
+      category_id: formData.categoryId,
+      account_id: formData.accountId,
     }
     try {
       const response = await updateTransaction({
-        transactionId: tId,
+        transactionId: id,
         transactionData,
       }).unwrap()
       alert(`transaction successfully created with id ${response.id}.`)
@@ -72,12 +76,22 @@ function UpdateTransactionForm({ id, open, setOpen }: Props) {
     }
   }
 
+  const handleInputChange = (
+    updateKey: string,
+    value: string | number | Dayjs
+  ) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [updateKey]: value,
+    }))
+  }
+
   return (
     <ModalForm2
       formId={thisFormId}
       label="Update Transaction"
       title="Update a transaction"
-      disabled={isNaN(tId)}
+      disabled={!id}
       open={open}
       setOpen={setOpen}
     >
@@ -88,8 +102,10 @@ function UpdateTransactionForm({ id, open, setOpen }: Props) {
             <Select
               id="account-select"
               labelId="account-select-label"
-              value={accountId}
-              onChange={(e) => setAccountId(e.target.value)}
+              value={formData.accountId}
+              onChange={(e) =>
+                handleInputChange("accountId", Number(e.target.value))
+              }
             >
               {accounts?.map((acc) => (
                 <MenuItem key={acc.id} value={acc.id}>
@@ -104,12 +120,14 @@ function UpdateTransactionForm({ id, open, setOpen }: Props) {
             <Select
               id="category-select"
               labelId="category-select-label"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
+              value={formData.categoryId}
+              onChange={(e) =>
+                handleInputChange("categoryId", Number(e.target.value))
+              }
             >
               {categories?.map((cat) => (
                 <MenuItem key={cat.id} value={cat.id}>
-                  {cat.name}
+                  <CategoryColorPill label={cat.name} colorKey={cat.color} />
                 </MenuItem>
               ))}
             </Select>
@@ -120,8 +138,8 @@ function UpdateTransactionForm({ id, open, setOpen }: Props) {
               id="description"
               label="Description"
               variant="outlined"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
             />
           </FormControl>
 
@@ -131,16 +149,20 @@ function UpdateTransactionForm({ id, open, setOpen }: Props) {
               label="Amount"
               variant="outlined"
               type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              value={formData.amount}
+              onChange={(e) =>
+                handleInputChange("amount", Number(e.target.value))
+              }
             />
           </FormControl>
 
           <FormControl fullWidth>
             <DateField
               label="Date"
-              value={date}
-              onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
+              value={formData.date}
+              onChange={(newValue) =>
+                handleInputChange("date", newValue ? newValue : dayjs())
+              }
             />
           </FormControl>
         </FormGroup>

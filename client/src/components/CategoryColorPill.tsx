@@ -17,6 +17,7 @@ export default function CategoryColorPill({ label, colorKey }: Props) {
         color: color.foreground,
         p: "2px 10px 2px 10px",
         borderRadius: "15px",
+        width: "fit-content",
       }}
     >
       {label}
