@@ -13,7 +13,7 @@ import {
 import StyledDataGrid from "@/components/StyledDataGrid"
 import CategoryColorPill from "@/components/CategoryColorPill"
 import RowEdit from "@/components/RowEdit"
-import UpdateCategoryForm2 from "@/scenes/categories/UpdateCat2"
+import UpdateCategoryForm from "@/scenes/categories/UpdateCategoryForm"
 import { useHandleDeleteCategory } from "@/hooks/useHandleDelete"
 
 const CategoriesView = () => {
@@ -53,7 +53,7 @@ const CategoriesView = () => {
         <RowEdit
           rowId={params.row.id}
           setSelectedRowIds={setSelectedRowIds}
-          UpdateModal={UpdateCategoryForm2}
+          UpdateModal={UpdateCategoryForm}
           handleDelete={handleDeleteCategory}
         />
       ),
