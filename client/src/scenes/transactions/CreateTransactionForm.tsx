@@ -36,12 +36,10 @@ function TransactionForm() {
       category_id: Number(categoryId),
     }
 
-    console.log(transactionData)
     try {
       const response = await createTransaction(transactionData).unwrap()
       alert(`transaction successfully created with id ${response.id}.`)
     } catch (error: unknown) {
-      console.log(error)
       alert(`Transaction could not be created: ${error.data.message}`)
     }
   }

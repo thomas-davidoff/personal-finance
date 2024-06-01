@@ -15,69 +15,85 @@ import {
 } from "@mui/material"
 import { DateField } from "@mui/x-date-pickers/DateField"
 import dayjs, { Dayjs } from "dayjs"
-import { GridRowId } from "@mui/x-data-grid"
-import ModalForm from "@/components/ModalForm"
+import CategoryColorPill from "@/components/CategoryColorPill"
+
+import ModalForm2 from "@/components/ModalForm2"
 
 interface Props {
-  transactionId: GridRowId[]
+  id: number
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function UpdateTransactionForm({ transactionId }: Props) {
+function UpdateTransactionForm({ id, open, setOpen }: Props) {
+  const thisFormId = "update-transaction-form"
+
   const { data: accounts } = useGetAccountsQuery()
   const { data: categories } = useGetCategoriesQuery()
-  const tId = Number(transactionId[0])
-  const { data: transaction } = useGetTransactionQuery(tId, {
-    skip: isNaN(tId),
+  const { data: transaction } = useGetTransactionQuery(id, {
+    skip: !open,
   })
 
   const [updateTransaction] = useUpdateTransactionMutation()
 
-  const [description, setDescription] = useState(transaction?.description || "")
-  const [amount, setAmount] = useState(transaction?.amount || 0)
-  const [accountId, setAccountId] = useState(transaction?.account.id || 0)
-  const [date, setDate] = useState<Dayjs>(dayjs())
-  const [categoryId, setCategoryId] = useState(transaction?.category?.id || 0)
+  const [formData, setFormData] = useState({
+    description: "",
+    amount: 0,
+    accountId: 0,
+    date: dayjs(),
+    categoryId: 0,
+  })
 
   useEffect(() => {
-    if (transaction) {
-      setDescription(transaction.description || "")
-      setAmount(transaction.amount || 0)
-      setAccountId(transaction.account?.id)
-      setDate(dayjs(transaction.date || dayjs()))
-      setCategoryId(transaction.category?.id || 0)
+    if (transaction && open) {
+      setFormData({
+        description: transaction.description || "",
+        amount: transaction.amount || 0,
+        accountId: transaction.account?.id,
+        date: dayjs(transaction.date) || dayjs(),
+        categoryId: transaction.category?.id || 0,
+      })
     }
-  }, [transaction])
+  }, [open, transaction])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const transactionData = {
-      description,
-      amount: Number(amount),
-      date: date.format("YYYY-MM-DD"),
-      category_id: categoryId,
-      account_id: accountId,
+      description: formData.description,
+      amount: Number(formData.amount),
+      date: formData.date.format("YYYY-MM-DD"),
+      category_id: formData.categoryId,
+      account_id: formData.accountId,
     }
     try {
       const response = await updateTransaction({
-        transactionId: tId,
+        transactionId: id,
         transactionData,
       }).unwrap()
-      console.log(response)
       alert(`transaction successfully created with id ${response.id}.`)
     } catch (error: unknown) {
-      console.log(error)
       alert(`Transaction could not be created: ${error.data.message}`)
     }
   }
 
-  const thisFormId = "POOOOOOOOO"
+  const handleInputChange = (
+    updateKey: string,
+    value: string | number | Dayjs
+  ) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [updateKey]: value,
+    }))
+  }
 
   return (
-    <ModalForm
+    <ModalForm2
       formId={thisFormId}
       label="Update Transaction"
       title="Update a transaction"
-      disabled={isNaN(tId)}
+      disabled={!id}
+      open={open}
+      setOpen={setOpen}
     >
       <form onSubmit={handleSubmit} id={thisFormId}>
         <FormGroup>
@@ -86,8 +102,10 @@ function UpdateTransactionForm({ transactionId }: Props) {
             <Select
               id="account-select"
               labelId="account-select-label"
-              value={accountId}
-              onChange={(e) => setAccountId(e.target.value)}
+              value={formData.accountId}
+              onChange={(e) =>
+                handleInputChange("accountId", Number(e.target.value))
+              }
             >
               {accounts?.map((acc) => (
                 <MenuItem key={acc.id} value={acc.id}>
@@ -102,12 +120,14 @@ function UpdateTransactionForm({ transactionId }: Props) {
             <Select
               id="category-select"
               labelId="category-select-label"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
+              value={formData.categoryId}
+              onChange={(e) =>
+                handleInputChange("categoryId", Number(e.target.value))
+              }
             >
               {categories?.map((cat) => (
                 <MenuItem key={cat.id} value={cat.id}>
-                  {cat.name}
+                  <CategoryColorPill label={cat.name} colorKey={cat.color} />
                 </MenuItem>
               ))}
             </Select>
@@ -118,8 +138,8 @@ function UpdateTransactionForm({ transactionId }: Props) {
               id="description"
               label="Description"
               variant="outlined"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
             />
           </FormControl>
 
@@ -129,21 +149,25 @@ function UpdateTransactionForm({ transactionId }: Props) {
               label="Amount"
               variant="outlined"
               type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              value={formData.amount}
+              onChange={(e) =>
+                handleInputChange("amount", Number(e.target.value))
+              }
             />
           </FormControl>
 
           <FormControl fullWidth>
             <DateField
               label="Date"
-              value={date}
-              onChange={(newValue) => setDate(newValue ? newValue : dayjs())}
+              value={formData.date}
+              onChange={(newValue) =>
+                handleInputChange("date", newValue ? newValue : dayjs())
+              }
             />
           </FormControl>
         </FormGroup>
       </form>
-    </ModalForm>
+    </ModalForm2>
   )
 }
 

@@ -44,7 +44,6 @@ const MostCommonWords = () => {
   useEffect(() => {
     if (isSuccess) {
       refetch()
-      console.log(commonWords)
     }
   }, [isSuccess, refetch])
 

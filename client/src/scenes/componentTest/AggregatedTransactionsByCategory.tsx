@@ -45,8 +45,6 @@ export default function AggregatedTransactionsByCategory({
       return result
     })
 
-  console.log(colorsMap)
-
   return (
     <Box sx={{ height: "100%", width: "100%" }}>
       <ResponsiveContainer width="100%" height="100%">

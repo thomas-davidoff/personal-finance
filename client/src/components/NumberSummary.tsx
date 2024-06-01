@@ -11,8 +11,7 @@ const NumberSummary = ({ number, subtitle }: Props) => {
 
   const display =
     number && number > 0 ? `$${number}` : `-$${number ? number * -1 : 0}`
-
-  console.log(number && number > 0 ? true : false)
+    
   return (
     <DashboardBox
       sx={{

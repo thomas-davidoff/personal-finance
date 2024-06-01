@@ -12,7 +12,6 @@ import {
   TextField,
   FormGroup,
 } from "@mui/material"
-import { GridRowId } from "@mui/x-data-grid"
 import ModalForm2 from "@/components/ModalForm2"
 import {
   transactionTypes,
@@ -21,51 +20,49 @@ import {
 import CategoryColorPill from "@/components/CategoryColorPill"
 
 interface Props {
-  categoryId: GridRowId[]
+  id: number
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
-  const [name, setName] = useState("")
-  const [transactionType, setTransactionType] = useState("")
-  const [color, setColor] = useState("grey")
-  const [transactionSubtype, setTransactionSubtype] = useState("")
-  const [cId, setcId] = useState(Number(categoryId[0])) // Initial set from props
-  const { data: category } = useGetCategoryQuery(cId, {
-    skip: isNaN(cId),
+function UpdateCategoryForm({ id, open, setOpen }: Props) {
+  const { data: category } = useGetCategoryQuery(id, {
+    skip: !open,
   })
   const { data: colors } = useGetColorSchemeQuery()
   const [updateCategory] = useUpdateCategoryMutation()
-  const [description, setDescription] = useState("")
 
-  // Effect to update cId when categoryId changes
-  useEffect(() => {
-    setcId(Number(categoryId[0]))
-  }, [categoryId])
+  const [formData, setFormData] = useState({
+    name: "",
+    transactionType: "",
+    color: "grey",
+    transactionSubtype: "",
+    description: "",
+  })
 
-  // Separate effect to log and update other states when cId changes
+  // use effect to set form data when the category is fetched at modal open
   useEffect(() => {
-    console.log(`new selection: ${cId}`) // Correct place to log the updated cId
-    if (category) {
-      setDescription(category.description || "")
-      setColor(category.color || "")
-      setName(category.name || "")
-      setTransactionType(category.transaction_type || "")
-      setTransactionSubtype(category.transaction_subtype || "")
+    if (category && open) {
+      setFormData({
+        name: category.name || "",
+        transactionType: category.transaction_type || "",
+        color: category.color || "",
+        transactionSubtype: category.transaction_subtype || "",
+        description: category.description || "",
+      })
     }
-  }, [cId, category]) // Notice cId is a dependency now
+  }, [open, category])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const categoryData = {
-      id: cId,
+      id,
       data: {
-        name: name,
-        description,
-        transaction_type: transactionType,
-        transaction_subtype: transactionSubtype,
-        color,
+        name: formData.name,
+        description: formData.description,
+        transaction_type: formData.transactionType,
+        transaction_subtype: formData.transactionSubtype,
+        color: formData.color,
       },
     }
 
@@ -84,6 +81,13 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
     }
   }
 
+  const handleInputChange = (updateKey: string, value: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [updateKey]: value,
+    }))
+  }
+
   const thisFormId = "update-category-form"
 
   return (
@@ -91,7 +95,7 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
       formId={thisFormId}
       label="Update Category"
       title="Update a category"
-      disabled={isNaN(cId)}
+      disabled={isNaN(id)}
       open={open}
       setOpen={setOpen}
     >
@@ -102,8 +106,8 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
               id="category-name-field"
               label="Category Name"
               variant="outlined"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
             />
           </FormControl>
 
@@ -114,8 +118,10 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
             <Select
               id="transaction-type-select-field"
               labelId="transaction-type-select-label"
-              value={transactionType}
-              onChange={(e) => setTransactionType(e.target.value)}
+              value={formData.transactionType}
+              onChange={(e) =>
+                handleInputChange("transactionType", e.target.value)
+              }
             >
               {transactionTypes.map((type) => (
                 <MenuItem key={type} value={type}>
@@ -130,8 +136,8 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
             <Select
               id="color-select-field"
               labelId="color-select-label"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
+              value={formData.color}
+              onChange={(e) => handleInputChange("color", e.target.value)}
             >
               {colors?.map((c) => (
                 <MenuItem
@@ -152,8 +158,10 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
             <Select
               id="transaction-subtype-select-field"
               labelId="transaction-subtype-select-label"
-              value={transactionSubtype}
-              onChange={(e) => setTransactionSubtype(e.target.value)}
+              value={formData.transactionSubtype}
+              onChange={(e) =>
+                handleInputChange("transactionSubtype", e.target.value)
+              }
             >
               {transactionSubtypes.map((type) => (
                 <MenuItem key={type} value={type}>
@@ -168,8 +176,8 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
               id="description"
               label="Description"
               variant="outlined"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
             />
           </FormControl>
         </FormGroup>
@@ -178,4 +186,4 @@ function UpdateCategoryForm2({ categoryId, open, setOpen }: Props) {
   )
 }
 
-export default UpdateCategoryForm2
+export default UpdateCategoryForm

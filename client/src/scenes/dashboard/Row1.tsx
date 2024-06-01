@@ -36,14 +36,8 @@ const Row1 = ({
   setSelectedYear,
 }: Props) => {
   const { palette } = useTheme()
-  // const { data } = {useGetMonthlyKPIsQuery({
-  //   month: selectedMonth, // selectedMonth
-  //   year: selectedYear, // selectedYear
-  // })}
 
   const data = [{}]
-
-  console.log(data)
 
   const byCategory = useMemo(() => {
     const filteredAndMappedCategories = data?.aggregate_by_category
@@ -66,8 +60,6 @@ const Row1 = ({
     },
     {}
   )
-
-  console.log(byTransactionType)
 
   const COLORS = [
     palette.primary[100],
@@ -104,8 +96,6 @@ const Row1 = ({
   }))
 
   const breakdown = data?.aggregate_by_category
-
-  console.log(breakdown)
 
   return (
     <>
