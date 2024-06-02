@@ -108,5 +108,9 @@ export const themeSettings = {
       fontSize: 10,
       color: tokens.grey[700],
     },
+    error: {
+      fontFamily: ["Inter", "sans-serif"].join(","),
+      color: tokens.tertiary,
+    },
   },
 }

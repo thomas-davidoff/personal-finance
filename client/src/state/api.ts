@@ -28,6 +28,7 @@ export const api = createApi({
     "SingleCategory",
     "AggregatedTransactionsByCategory",
     "ColorScheme",
+    "SingleKeyword",
   ],
   endpoints: (build) => ({
     getAccounts: build.query<Array<Account>, void>({
@@ -101,6 +102,21 @@ export const api = createApi({
         url: "keywords/",
         method: "POST",
         body: keywordData,
+      }),
+      invalidatesTags: ["AllKeywords"],
+    }),
+    getKeyword: build.query<KeywordResponse, number>({
+      query: (id) => `keywords/${id}`,
+      providesTags: ["SingleKeyword"],
+    }),
+    updateKeyword: build.mutation<
+      KeywordResponse,
+      { id: number; data: KeywordRequest }
+    >({
+      query: ({ id, data }) => ({
+        url: `keywords/${id}`,
+        method: "PATCH",
+        body: data,
       }),
       invalidatesTags: ["AllKeywords"],
     }),
@@ -236,4 +252,6 @@ export const {
   useGetAggregatedTransactionsByCategoryQuery,
   useGetAccountRunningBalanceQuery,
   useGetColorSchemeQuery,
+  useGetKeywordQuery,
+  useUpdateKeywordMutation,
 } = api
