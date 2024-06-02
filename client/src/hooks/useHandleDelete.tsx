@@ -1,48 +1,8 @@
-import { MutationTrigger } from "@reduxjs/toolkit/dist/query/react/buildHooks"
-import {
-  MutationDefinition,
-  BaseQueryFn,
-  FetchArgs,
-  FetchBaseQueryError,
-  FetchBaseQueryMeta,
-} from "@reduxjs/toolkit/query/react"
 import {
   useDeleteCategoryMutation,
   useDeleteTransactionMutation,
 } from "@/state/api"
-
-type GenericMutationHook<
-  MutationResponse,
-  MutationArg,
-  Tags extends string
-> = Readonly<
-  [
-    MutationTrigger<
-      MutationDefinition<
-        MutationArg,
-        BaseQueryFn<
-          string | FetchArgs,
-          unknown,
-          FetchBaseQueryError,
-          object,
-          FetchBaseQueryMeta
-        >,
-        Tags,
-        MutationResponse,
-        "main"
-      >
-    >,
-    {
-      isLoading: boolean
-      isSuccess: boolean
-      isError: boolean
-      error?: FetchBaseQueryError | undefined
-      data?: MutationResponse
-      originalArgs?: MutationArg
-      fulfilledTimeStamp?: number
-    }
-  ]
->
+import { GenericMutationHook } from "@/state/types"
 
 interface Props {
   deleteMutation: GenericMutationHook<{ message: string }, number, string>
