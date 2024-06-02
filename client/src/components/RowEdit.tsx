@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import IconButton from "@mui/material/IconButton"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
-import { GridRowId } from "@mui/x-data-grid"
+import { ListItemIcon } from "@mui/material"
+import { Create } from "@mui/icons-material"
+import DeleteIcon from "@mui/icons-material/Delete"
 
 interface RowEditProps {
   rowId: number
-  setSelectedRowIds?: React.Dispatch<React.SetStateAction<GridRowId[]>>
   UpdateModal: React.FunctionComponent<{
     open: boolean
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -18,18 +19,11 @@ interface RowEditProps {
 
 export default function RowEdit({
   rowId,
-  setSelectedRowIds,
   UpdateModal,
   handleDelete,
 }: RowEditProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
-
-  useEffect(() => {
-    if (open && setSelectedRowIds) {
-      setSelectedRowIds([rowId])
-    }
-  }, [open])
 
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -70,8 +64,18 @@ export default function RowEdit({
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleOpenModal}>Update</MenuItem>
-        <MenuItem onClick={handleDeleteRow}>Delete</MenuItem>
+        <MenuItem onClick={handleOpenModal}>
+          <ListItemIcon>
+            <Create />
+          </ListItemIcon>
+          Update
+        </MenuItem>
+        <MenuItem onClick={handleDeleteRow}>
+          <ListItemIcon>
+            <DeleteIcon />
+          </ListItemIcon>
+          Delete
+        </MenuItem>
       </Menu>
       <UpdateModal open={modalOpen} setOpen={setModalOpen} id={rowId} />
     </div>

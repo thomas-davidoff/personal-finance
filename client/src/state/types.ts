@@ -1,3 +1,12 @@
+import { MutationTrigger } from "@reduxjs/toolkit/dist/query/react/buildHooks"
+import {
+  MutationDefinition,
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+  FetchBaseQueryMeta,
+} from "@reduxjs/toolkit/query/react"
+
 export interface ExpensesByCategory {
   salaries: number
   supplies: number
@@ -140,11 +149,9 @@ export interface GetMonthlyKPIsResponse {
   cumulative_spending: GetMonthlyCumulativeSpendingResponse[]
 }
 
-export interface Account {
+export interface Account extends AccountCompact {
   account_type?: string
   current_balance?: number
-  id: number
-  name?: string
   num_transactions?: number
   starting_balance?: number
 }
@@ -243,4 +250,65 @@ export interface getCommonDescriptionWordsResponse {
   combos: Combo[]
   count: number
   phrase: string
+}
+
+export type GenericMutationHook<
+  MutationResponse,
+  MutationArg,
+  Tags extends string
+> = Readonly<
+  [
+    MutationTrigger<
+      MutationDefinition<
+        MutationArg,
+        BaseQueryFn<
+          string | FetchArgs,
+          unknown,
+          FetchBaseQueryError,
+          object,
+          FetchBaseQueryMeta
+        >,
+        Tags,
+        MutationResponse,
+        "main"
+      >
+    >,
+    {
+      isLoading: boolean
+      isSuccess: boolean
+      isError: boolean
+      error?: FetchBaseQueryError | undefined
+      data?: MutationResponse
+      originalArgs?: MutationArg
+      fulfilledTimeStamp?: number
+    }
+  ]
+>
+
+interface AccountCompact {
+  id: number
+  name: string
+}
+
+export interface TransactionSubmissionProps {
+  id?: number
+  description: string
+  amount: number
+  account: AccountCompact
+  date: string
+  category: CategoryCompactResponse
+}
+
+export interface CategorySubmissionProps {
+  name: string
+  description: string
+  transactionType: string
+  color: string
+  transactionSubtype: string
+}
+
+export interface KeywordSubmissionProps {
+  keyword: string
+  description: string
+  categoryId: number
 }
