@@ -12,8 +12,8 @@ import {
 } from "@mui/material"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp"
-import AddKeywordForm from "@/scenes/categories/mostCommonWords/addKeywordForm"
 import { getCommonDescriptionWordsResponse } from "@/state/types"
+import CreateKeywordButton from "../keywords/CreateKeywordButton"
 
 interface NestedRowProps {
   row: getCommonDescriptionWordsResponse
@@ -37,7 +37,7 @@ export default function NestedRow({ row }: NestedRowProps) {
         <TableCell>{row.avg_amount.toFixed(2)}</TableCell>
         <TableCell>{row.total_amount.toFixed(2)}</TableCell>
         <TableCell>
-          <AddKeywordForm placeholderKeyword={row.phrase} />
+          <CreateKeywordButton placeholder={row.phrase} />
         </TableCell>
       </TableRow>
       <TableRow>

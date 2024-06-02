@@ -33,7 +33,6 @@ function TestPage() {
         startDate={startDate.format("YYYY-MM-DD")}
         endDate={endDate.format("YYYY-MM-DD")}
       />
-      {/* <AggregatedTransactionsByCategory /> */}
     </Box>
   )
 }

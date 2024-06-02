@@ -2,26 +2,19 @@ import { useGetCategoriesQuery } from "@/state/api"
 import { Box } from "@mui/material"
 import MostCommonWords from "@/scenes/categories/mostCommonWords"
 import AllKeywordsTable from "@/scenes/categories/AllKeywords"
-import AddCategoryForm from "@/scenes/categories/AddCategoryForm"
 import { useState, useEffect } from "react"
-import {
-  GridColDef,
-  GridRowId,
-  GridRowsProp,
-  GridRowModesModel,
-} from "@mui/x-data-grid"
+import { GridColDef, GridRowsProp, GridRowModesModel } from "@mui/x-data-grid"
 import StyledDataGrid from "@/components/StyledDataGrid"
 import CategoryColorPill from "@/components/CategoryColorPill"
 import RowEdit from "@/components/RowEdit"
-import UpdateCategoryForm from "@/scenes/categories/UpdateCategoryForm"
 import { useHandleDeleteCategory } from "@/hooks/useHandleDelete"
+import CategoryModal from "@/scenes/categories/categoryModal"
+import CreateCategoryButton from "@/scenes/categories/createCategoryButton"
 
 const CategoriesView = () => {
   const { data: categories } = useGetCategoriesQuery()
-  const [selectedRowIds, setSelectedRowIds] = useState<Array<GridRowId>>([])
   const [rows, setRows] = useState<GridRowsProp>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
-
   const handleDeleteCategory = useHandleDeleteCategory()
 
   const columns: GridColDef[] = [
@@ -52,8 +45,7 @@ const CategoriesView = () => {
       renderCell: (params) => (
         <RowEdit
           rowId={params.row.id}
-          setSelectedRowIds={setSelectedRowIds}
-          UpdateModal={UpdateCategoryForm}
+          UpdateModal={CategoryModal}
           handleDelete={handleDeleteCategory}
         />
       ),
@@ -76,18 +68,14 @@ const CategoriesView = () => {
   }, [categories])
   return (
     <Box display="grid" gap="1.5rem">
-      {selectedRowIds}
       <Box>
-        <AddCategoryForm />
+        <CreateCategoryButton />
         {categories && (
           <StyledDataGrid
             rows={rows}
             columns={columns}
             rowModesModel={rowModesModel}
             onRowModesModelChange={(model) => setRowModesModel(model)}
-            onRowSelectionModelChange={(newSelectionModel) => {
-              setSelectedRowIds(newSelectionModel)
-            }}
           />
         )}
       </Box>

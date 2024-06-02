@@ -1,39 +1,44 @@
 import { Box } from "@mui/material"
 import { useGetTransactionsQuery } from "@/state/api"
-import TransactionForm from "@/scenes/transactions/CreateTransactionForm"
-import UpdateTransactionForm from "@/scenes/transactions/UpdateTransactionForm"
 import { useState, useEffect } from "react"
-import {
-  GridColDef,
-  GridRowId,
-  GridRowsProp,
-  GridRowModesModel,
-} from "@mui/x-data-grid"
+import { GridColDef, GridRowsProp, GridRowModesModel } from "@mui/x-data-grid"
 import StyledDataGrid from "@/components/StyledDataGrid"
-import DashboardBox from "@/components/DashboardBox"
-import DeleteMultipleTransactions from "@/scenes/transactions/DeleteTransactionButton"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import CategoryColorPill from "@/components/CategoryColorPill"
 import RowEdit from "@/components/RowEdit"
 import { useHandleDeleteTransaction } from "@/hooks/useHandleDelete"
+import CreateTransactionButton from "@/scenes/transactions/createTransactionButton"
+import TransactionModal from "@/scenes/transactions/transactionModal"
 
 dayjs.extend(utc)
 
 const Transactions = () => {
-  const [selectedRowIds, setSelectedRowIds] = useState<Array<GridRowId>>([])
   const [rows, setRows] = useState<GridRowsProp>([])
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
 
   const handleDeleteTransaction = useHandleDeleteTransaction()
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 75 },
+    {
+      field: "edit",
+      headerName: "Edit",
+      width: 50,
+      renderCell: (params) => (
+        <RowEdit
+          rowId={params.row.id}
+          UpdateModal={TransactionModal}
+          handleDelete={handleDeleteTransaction}
+        />
+      ),
+      sortable: false,
+    },
+    { field: "id", headerName: "ID", flex: 1 },
     {
       field: "date",
       headerName: "Date",
       type: "date",
-      width: 125,
+      flex: 1,
       renderCell: (params) => {
         return dayjs.utc(params.value).format("MMM DD, YYYY")
       },
@@ -41,14 +46,14 @@ const Transactions = () => {
     {
       field: "description",
       headerName: "Description",
-      width: 600,
+      flex: 5,
     },
     { field: "account", headerName: "Account", width: 125 },
     { field: "amount", headerName: "Amount", width: 150 },
     {
       field: "category",
       headerName: "Category",
-      width: 150,
+      flex: 1,
       renderCell: (params) => {
         return (
           <CategoryColorPill
@@ -57,20 +62,6 @@ const Transactions = () => {
           />
         )
       },
-    },
-    {
-      field: "edit",
-      headerName: "Edit",
-      flex: 1,
-      renderCell: (params) => (
-        <RowEdit
-          rowId={params.row.id}
-          setSelectedRowIds={setSelectedRowIds}
-          UpdateModal={UpdateTransactionForm}
-          handleDelete={handleDeleteTransaction}
-        />
-      ),
-      sortable: false,
     },
   ]
 
@@ -95,26 +86,22 @@ const Transactions = () => {
 
   return (
     <Box width="100%" height="100%">
-      <DeleteMultipleTransactions transactionId={selectedRowIds} />
-      <DashboardBox>
-        <TransactionForm />
-      </DashboardBox>
-      <DashboardBox display={"flex"} minHeight={250}>
+      <Box>
+        {/* TODO: Create search bar functionality for transactions */}
+        <CreateTransactionButton />
+      </Box>
+      <Box display={"flex"} minHeight={250}>
         <div style={{ flexGrow: 1 }}>
           {transactionsData && (
             <StyledDataGrid
               rows={rows}
               columns={columns}
-              // editMode="row"
               rowModesModel={rowModesModel}
               onRowModesModelChange={(model) => setRowModesModel(model)}
-              onRowSelectionModelChange={(newSelectionModel) => {
-                setSelectedRowIds(newSelectionModel)
-              }}
             />
           )}
         </div>
-      </DashboardBox>
+      </Box>
     </Box>
   )
 }
